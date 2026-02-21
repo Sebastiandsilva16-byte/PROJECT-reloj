@@ -24,7 +24,7 @@
  </OUTPUT_FILES>
  <LABELS>
   <SETUP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>20</LINE></SETUP>
-  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>195</LINE></TIMER0_COMPA>
+  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>213</LINE></TIMER0_COMPA>
   <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>85</LINE></MAIN_LOOP>
   <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>175</LINE></TIEMPO>
   <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>91</LINE></DISPSEL>
@@ -34,7 +34,9 @@
   <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>123</LINE></DISP2>
   <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>131</LINE></DISP3>
   <DISPLAY><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>139</LINE></DISPLAY>
-  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>208</LINE></disp7seg>
-  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>191</LINE></TIMER_RET>
+  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>226</LINE></disp7seg>
+  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>209</LINE></TIMER_RET>
+  <ZEROoDIEZ><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>198</LINE></ZEROoDIEZ>
+  <DECENASdeHORAS><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>203</LINE></DECENASdeHORAS>
  </LABELS>
 </ASSEMBLER_INFO>

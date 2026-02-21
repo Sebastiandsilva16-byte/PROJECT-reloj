@@ -69,15 +69,15 @@ SETUP:
     // Inicializar registros
     CLR R16		//
     CLR R17		// Contador de ciclos timer 10ms
-    CLR R18		// Cuenta (S unidades)
+    CLR R18		// Cuenta unidades Minutos
 	CLR R19		
 	CLR R20		// Se usa Zhigh eb DIPLAY
     CLR R21		// Seleciona Display
-	CLR R22		// Cuenta Decenas S
+	CLR R22		// Cuenta Decenas Minutos
 	CLR R23		// Valor a buscar en el .db
-	CLR R24		// Cuenta Minuto
+	CLR R24		// Cuenta HORAS
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
-	CLR R26		// Decenas de minutos 
+	CLR R26		// Decenas de HORAS
     SEI        // Habilitar interrupciones globales
 
 //-------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ DISP2:
     CBI PORTD, 4    // Apaga PD4
     CBI PORTD, 6    // Apaga PD6
     SBI PORTD, 5    // Enciende PD5 (DISP2)
-	MOV R23, R18	// Cuenta de Unidades S a R23
+	MOV R23, R24	// Cuenta de Unidades S a R23
     RJMP DISPLAY
 
 DISP3:
@@ -133,7 +133,7 @@ DISP3:
     CBI PORTD, 4    // Apaga PD4
     CBI PORTD, 5    // Apaga PD5
     SBI PORTD, 6    // Enciende PD6 (DISP3)
-	MOV R23, R22	// Cuenta de Decenas S a R23
+	MOV R23, R26	// Cuenta de Decenas S a R23
     RJMP DISPLAY
 
 DISPLAY:
@@ -174,19 +174,37 @@ RET
 
 TIEMPO:
 
-    CPI R17, 100
+    CPI R17, 1 //100 10 para test
     BRLO TIMER_RET //Cuenta los 10ms
     CLR R17
 
-    INC R18			//Unidades de Segundos
+    INC R18			//Unidades de Minutos
     CPI R18, 10
     BRLO TIMER_RET
 	CLR R18
 
-	INC R22			//Decenas de segundos
+	INC R22			//Decenas de Minutos
 	CPI R22, 6
 	BRLO TIMER_RET
 	CLR R22
+
+	INC R24			//Unidades de Horas
+	CPI R26, 2	
+	BRNE ZEROoDIEZ // revisa que no ha llegado a 20
+	CPI R24, 4
+	BRLO TIMER_RET
+	CLR R24
+	RJMP DECENASdeHORAS
+ZEROoDIEZ:
+	CPI R24, 10
+	BRLO TIMER_RET
+	CLR R24
+
+DECENASdeHORAS:
+	INC R26			//Decenas de Horas
+	CPI R26, 3
+	BRLO TIMER_RET
+	CLR R26
 
 TIMER_RET:
     RET
