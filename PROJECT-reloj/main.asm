@@ -67,16 +67,17 @@ SETUP:
     STS TIMSK0, R16
 
     // Inicializar registros
-    CLR R16		// Multifuncional
+    CLR R16		//
     CLR R17		// Contador de ciclos timer 10ms
     CLR R18		// Cuenta (S unidades)
-	CLR R19		// (se usa para buscar los valores R18) busca los valores para el display
+	CLR R19		
 	CLR R20		// Se usa Zhigh eb DIPLAY
     CLR R21		// Seleciona Display
-	CLR R22		// Cuenta Decenas
-
-	CLR R25		// Agarra los valores de R19 Para Actualizar el display
-	CLR R26		// Cuenta para las decenas de segundos (S)
+	CLR R22		// Cuenta Decenas S
+	CLR R23		// Valor a buscar en el .db
+	CLR R24		// Cuenta Minuto
+	CLR R25		// Agarra los valores de R23 Para Actualizar el display
+	CLR R26		// Decenas de minutos 
     SEI        // Habilitar interrupciones globales
 
 //-------------------------------------------------------------------------------------
@@ -84,7 +85,7 @@ SETUP:
 MAIN_LOOP:
     CALL TIEMPO
 	INC R21 //Va haciendo na cuenta para actulizar los contadores individualmente
-    CPI R21, 2     
+    CPI R21, 4    
     BRLO DISPSEL     // Si R21 < 4, está bien
     CLR R21          // Si R21 >= 4, resetea a 0
 DISPSEL:
@@ -108,36 +109,34 @@ DISP0:
     CBI PORTD, 5    // Apaga PD5
     CBI PORTD, 6    // Apaga PD6
     SBI PORTD, 3    // Enciende PD3 (DISP0)
-	CALL DISPLAY0
-
-    RJMP FINDISP
+	MOV R23, R18	// Cuenta de Unidades S a R23
+	RJMP DISPLAY
 
 DISP1:
     CBI PORTD, 3    // Apaga PD3
     CBI PORTD, 5    // Apaga PD5
     CBI PORTD, 6    // Apaga PD6
     SBI PORTD, 4    // Enciende PD4 (DISP1)
-	CALL DISPLAY1
-    RJMP FINDISP
+	MOV R23, R22	// Cuenta de Decenas S a R23
+    RJMP DISPLAY
 
 DISP2:
     CBI PORTD, 3    // Apaga PD3
     CBI PORTD, 4    // Apaga PD4
     CBI PORTD, 6    // Apaga PD6
     SBI PORTD, 5    // Enciende PD5 (DISP2)
-    RJMP FINDISP
+	MOV R23, R18	// Cuenta de Unidades S a R23
+    RJMP DISPLAY
 
 DISP3:
     CBI PORTD, 3    // Apaga PD3
     CBI PORTD, 4    // Apaga PD4
     CBI PORTD, 5    // Apaga PD5
     SBI PORTD, 6    // Enciende PD6 (DISP3)
-    RJMP FINDISP
+	MOV R23, R22	// Cuenta de Decenas S a R23
+    RJMP DISPLAY
 
-FINDISP:
-    RET
-
-DISPLAY0:
+DISPLAY:
 	PUSH ZH
     PUSH ZL
 
@@ -145,17 +144,16 @@ DISPLAY0:
     LDI ZL, LOW(disp7seg << 1)
 
 	// busca los valores para el 7 segmentos
-	MOV R19, R18
-	lsl r19		//mueve los bits a la iz (multiplica por 2)
-	ADD ZL, R19
+	lsl R23		//mueve los bits a la iz (multiplica por 2)
+	ADD ZL, R23
 	LDI R20, 0
 	ADC ZH, R20
-	LPM R19, Z
+	LPM R23, Z
 	POP ZL
     POP ZH
 
 	//Actualiza todo el portC (6 segmentos)
-	MOV R25, R19
+	MOV R25, R23
 	OUT PORTC, R25  
 	//Actualiza el ultimo segmento
 	SBRC R25, 6
@@ -163,54 +161,16 @@ DISPLAY0:
     SBRS R25, 6
     CBI PORTD, PORTD2
 
-	//limpia para que no afecte los otros diplays-----------------------------
+	//Limpia para que no afecte los otros diplays
 	CLR R25
 	OUT PORTC, R25  
 	//Actualiza el ultimo segmento
 	SBRC R25, 6
     SBI PORTD, PORTD2
     SBRS R25, 6
-    CBI PORTD, PORTD2 //----------------------
-
+    CBI PORTD, PORTD2 
 RET
 
-DISPLAY1:
-	PUSH ZH
-    PUSH ZL
-
-    LDI ZH, HIGH(disp7seg << 1)
-    LDI ZL, LOW(disp7seg << 1)
-
-	// busca los valores para el 7 segmentos
-	MOV R19, R22
-	lsl r19		//mueve los bits a la iz (multiplica por 2)
-	ADD ZL, R19
-	LDI R20, 0
-	ADC ZH, R20
-	LPM R19, Z
-	POP ZL
-    POP ZH
-
-	//Actualiza todo el portC (6 segmentos)
-	MOV R25, R19
-	OUT PORTC, R25  
-	//Actualiza el ultimo segmento
-	SBRC R25, 6
-    SBI PORTD, PORTD2
-    SBRS R25, 6
-    CBI PORTD, PORTD2
-
-	//limpia para que no afecte los otros diplays //----------------------
-	CLR R25
-	OUT PORTC, R25  
-	//Actualiza el ultimo segmento 
-	SBRC R25, 6
-    SBI PORTD, PORTD2
-    SBRS R25, 6
-    CBI PORTD, PORTD2 //----------------------
-
-
-RET
 
 TIEMPO:
 
