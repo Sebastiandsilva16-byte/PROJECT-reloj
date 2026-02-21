@@ -1,0 +1,41 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\Debug\PROJECT-reloj.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>PROJECT-reloj.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>PROJECT-reloj.map</FILE>
+  <FILE>PROJECT-reloj.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <SETUP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>20</LINE></SETUP>
+  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>179</LINE></TIMER0_COMPA>
+  <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>83</LINE></MAIN_LOOP>
+  <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>165</LINE></TIEMPO>
+  <DISPLAYSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>89</LINE></DISPLAYSEL>
+  <DISPLAY><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>138</LINE></DISPLAY>
+  <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>94</LINE></DISPSEL>
+  <DISP0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>105</LINE></DISP0>
+  <DISP1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>112</LINE></DISP1>
+  <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>119</LINE></DISP2>
+  <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>126</LINE></DISP3>
+  <FINDISP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>133</LINE></FINDISP>
+  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>192</LINE></disp7seg>
+  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>175</LINE></TIMER_RET>
+ </LABELS>
+</ASSEMBLER_INFO>

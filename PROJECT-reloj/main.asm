@@ -24,16 +24,6 @@ SETUP:
     LDI     R16, HIGH(RAMEND)
     OUT     SPH, R16
 
-    
-    // Salidas LEDs (PD4-PD7) (apagados)
-    SBI DDRD, DDD4    // PD4 salida
-    CBI PORTD, PORTD4 
-    SBI DDRD, DDD5    // PD5 salida
-    CBI PORTD, PORTD5
-    SBI DDRD, DDD6    // PD6 salida
-    CBI PORTD, PORTD6
-    SBI DDRD, DDD7    // PD7 salida
-    CBI PORTD, PORTD7
 	// Salidas LEDs (PC0-PC5) y (PD3) (apagados) (7 segmentos)
 	SBI DDRC, DDC0    // PC0 salida
     CBI PORTC, PORTC0
@@ -47,23 +37,17 @@ SETUP:
     CBI PORTC, PORTC4
 	SBI DDRC, DDC5    // PC5 salida
     CBI PORTC, PORTC5
-	SBI DDRD, DDD3    //  salida  (PC6 se quemo y no funciona)
+	SBI DDRD, DDD2    // PD2 Salida
+    CBI PORTD, PORTD2 
+	// Salidas para habilitar que display actualizar (PD3-PD6)
+	SBI DDRD, DDD3    // PD3 Salida
     CBI PORTD, PORTD3 
-	// Salidas LEDs (PB0-PB5) y (PC7) (apagados) (7 segmentos 2)
-	SBI DDRB, DDB0    // PB0 como salida 
-	CBI PORTB, PORTB0 // A
-	SBI DDRB, DDB1    // PB1 como salida 
-	CBI PORTB, PORTB1
-	SBI DDRB, DDB2    // PB2 como salida 
-	CBI PORTB, PORTB2
-	SBI DDRB, DDB3    // PB3 como salida 
-	CBI PORTB, PORTB3
-	SBI DDRB, DDB4    // PB4 como salida 
-	CBI PORTB, PORTB4
-	SBI DDRB, DDB5    // PB5 como salida 
-	CBI PORTB, PORTB5
-	SBI DDRD, DDD2    // PD2 como salida 
-	CBI PORTD, PORTD2
+	SBI DDRD, DDD4    // PD4 Salida
+    CBI PORTD, PORTD4
+	SBI DDRD, DDD5    // PD5 Salida
+    CBI PORTD, PORTD5 
+	SBI DDRD, DDD6    // PD6 Salida
+    CBI PORTD, PORTD6  
 
     // Configuraci?n Timer0 para 10ms en modo CTC
     LDI R16, (1 << WGM01)    ; Modo CTC (Clear Timer on Compare Match)
@@ -85,20 +69,71 @@ SETUP:
     // Inicializar registros
     CLR R16		// Multifuncional
     CLR R17		// Contador de ciclos timer (para 1 segundo)
-    CLR R18		// Contador para LEDs (0-15)
-    CLR R21		// para actualizar los leds
-	CLR R19		// para los leds del 7 segmentos
-	CLR R20		// ayuda para leds del 7 segmentos
-	CLR R26		// cuenta del segundo segmento
+    CLR R18		// Cuenta (S)
+	CLR R19		// (se usa para buscar los valores R18) busca los valores para el display
+	CLR R20		// Se usa Zhigh eb DIPLAY
+    CLR R21		// Seleciona Display
+
+	CLR R25		// Agarra los valores de R19 Para Actualizar el display
+	CLR R26		// Cuenta para las decenas de segundos (S)
     SEI        // Habilitar interrupciones globales
 
 //-------------------------------------------------------------------------------------
 
 MAIN_LOOP:
-    CALL LEDS
     CALL TIEMPO
-	CALL DISPLAY //(segundos)
+	CALL DISPLAYSEL
+	CALL DISPLAY		//Actualiza el display actual
     RJMP MAIN_LOOP
+
+DISPLAYSEL:
+   
+    CPI R21, 4       // Verifica si R21 es 4 o mayor
+    BRLO DISPSEL     // Si R21 < 4, está bien
+    CLR R21          // Si R21 >= 4, resetea a 0
+DISPSEL:
+    CPI R21, 0 // Compara con 0
+    BREQ DISP0 // Salta a DISP0 si R21 = 0
+    CPI R21, 1 // Compara con 1
+    BREQ DISP1 // Salta a DISP1 si R21 = 1
+    CPI R21, 2 // Compara con 2
+    BREQ DISP2 // Salta a DISP2 si R21 = 2
+    CPI R21, 3 // Compara con 3
+    BREQ DISP3 // Salta a DISP3 si R21 = 3
+	//nunca deberia pasar sin saltar
+
+DISP0:
+    CBI PORTD, 4    // Apaga PD4
+    CBI PORTD, 5    // Apaga PD5
+    CBI PORTD, 6    // Apaga PD6
+    SBI PORTD, 3    // Enciende PD3 (DISP0)
+    RJMP FINDISP
+
+DISP1:
+    CBI PORTD, 3    // Apaga PD3
+    CBI PORTD, 5    // Apaga PD5
+    CBI PORTD, 6    // Apaga PD6
+    SBI PORTD, 4    // Enciende PD4 (DISP1)
+    RJMP FINDISP
+
+DISP2:
+    CBI PORTD, 3    // Apaga PD3
+    CBI PORTD, 4    // Apaga PD4
+    CBI PORTD, 6    // Apaga PD6
+    SBI PORTD, 5    // Enciende PD5 (DISP2)
+    RJMP FINDISP
+
+DISP3:
+    CBI PORTD, 3    // Apaga PD3
+    CBI PORTD, 4    // Apaga PD4
+    CBI PORTD, 5    // Apaga PD5
+    SBI PORTD, 6    // Enciende PD6 (DISP3)
+    RJMP FINDISP
+
+FINDISP:
+    RET
+
+
 
 DISPLAY:
 	PUSH ZH
@@ -117,86 +152,27 @@ DISPLAY:
 	POP ZL
     POP ZH
 
-		//XGFEDCBA  en el portd quiero FEDCBA00y en el portB quiero sacar G
+	//Actualiza todo el portC (6 segmentos)
 	MOV R25, R19
-    
-	OUT PORTC, R25
-
-	SBRC R25, 6
-    SBI PORTD, PORTD3
-    SBRS R25, 6
-    CBI PORTD, PORTD3
-
-//2do display
-	PUSH ZH
-    PUSH ZL
-
-    LDI ZH, HIGH(disp7seg << 1)
-    LDI ZL, LOW(disp7seg << 1)
-
-	// busca los valores para el 7 segmentos
-	MOV R19, R26
-	lsl r19		//mueve los bits a la iz (multiplica por 2)
-	ADD ZL, R19
-	LDI R20, 0
-	ADC ZH, R20
-	LPM R19, Z
-	POP ZL
-    POP ZH
-
-	MOV R25, R19
-
-	OUT PORTB, R25
-
+	OUT PORTC, R25  
+	//Actualiza el ultimo segmento
 	SBRC R25, 6
     SBI PORTD, PORTD2
     SBRS R25, 6
     CBI PORTD, PORTD2
 
-	RET
 
 TIEMPO:
     CPI R17, 100
     BRLO TIMER_RET
     CLR R17
     INC R18
+	INC R21 //diplay sel
     CPI R18, 10
     BRLO TIMER_RET
 	CLR R18
-	INC R26
-	CPI R26, 7
-	BRLO TIMER_RET
-    CLR R26
-TIMER_RET:
-    RET
 
-LEDS:
-    MOV R21, R18        // Copiar contador a registro temporal
-    
-    // PD7 (bit 0)
-    SBRC R21, 0
-    SBI PORTD, PORTD7
-    SBRS R21, 0
-    CBI PORTD, PORTD7
-    
-    // PD6 (bit 1)
-    SBRC R21, 1
-    SBI PORTD, PORTD6
-    SBRS R21, 1
-    CBI PORTD, PORTD6
-    
-    // PD5 (bit 2)
-    SBRC R21, 2
-    SBI PORTD, PORTD5
-    SBRS R21, 2
-    CBI PORTD, PORTD5
-    
-    // PD4 (bit 3)
-    SBRC R21, 3
-    SBI PORTD, PORTD4
-    SBRS R21, 3
-    CBI PORTD, PORTD4
-    
+TIMER_RET:
     RET
 
 // Rutina de interrupci?n del Timer0 - Modo COMPARE MATCH
