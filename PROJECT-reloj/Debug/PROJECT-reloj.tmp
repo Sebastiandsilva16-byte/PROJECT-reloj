@@ -24,18 +24,19 @@
  </OUTPUT_FILES>
  <LABELS>
   <SETUP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>20</LINE></SETUP>
-  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>179</LINE></TIMER0_COMPA>
-  <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>83</LINE></MAIN_LOOP>
-  <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>165</LINE></TIEMPO>
-  <DISPLAYSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>89</LINE></DISPLAYSEL>
-  <DISPLAY><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>138</LINE></DISPLAY>
-  <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>94</LINE></DISPSEL>
-  <DISP0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>105</LINE></DISP0>
-  <DISP1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>112</LINE></DISP1>
-  <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>119</LINE></DISP2>
-  <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>126</LINE></DISP3>
-  <FINDISP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>133</LINE></FINDISP>
-  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>192</LINE></disp7seg>
-  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>175</LINE></TIMER_RET>
+  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>235</LINE></TIMER0_COMPA>
+  <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>84</LINE></MAIN_LOOP>
+  <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>215</LINE></TIEMPO>
+  <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>90</LINE></DISPSEL>
+  <DISPLAYSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>94</LINE></DISPLAYSEL>
+  <DISP0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>106</LINE></DISP0>
+  <DISP1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>115</LINE></DISP1>
+  <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>123</LINE></DISP2>
+  <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>130</LINE></DISP3>
+  <DISPLAY0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>140</LINE></DISPLAY0>
+  <FINDISP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>137</LINE></FINDISP>
+  <DISPLAY1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>177</LINE></DISPLAY1>
+  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>248</LINE></disp7seg>
+  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>231</LINE></TIMER_RET>
  </LABELS>
 </ASSEMBLER_INFO>
