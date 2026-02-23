@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Sat Feb 21 14:55:20 2026
+AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Mon Feb 23 13:47:37 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1042,8 +1042,9 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  .cseg
                                  .org 0x0000
 000000 c033                          RJMP SETUP
-                                 .org 0x0020          // Vector de interrupci?n para TIMER0_COMPA (modo CTC)
-000020 c09d                          RJMP TIMER0_COMPA
+                                 .org 0x0016         // Vector de interrupción para TIMER1_COMPA (NUEVO)
+000016 c0b7                          RJMP TIMER1_COMPA
+                                 
                                  
                                  
                                  .org 0x0034
@@ -1054,238 +1055,258 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 000035 bf0d                          OUT     SPL, R16
 000036 e008                          LDI     R16, HIGH(RAMEND)
 000037 bf0e                          OUT     SPH, R16
+                                 		
+                                 // ------------------------------------
+000038 9a25                      	SBI DDRB, DDB5    // led para probar
+000039 982d                          CBI PORTB, PORTB5
+                                 
+                                 	WDT_disable:
+00003a e108                          LDI R16, (1<<WDCE) | (1<<WDE)
+00003b 9300 0060                     STS WDTCSR, R16
+00003d e000                          LDI R16, (0<<WDE)
+00003e 9300 0060                     STS WDTCSR, R16
                                  
                                  	// Salidas LEDs (PC0-PC5) y (PD3) (apagados) (7 segmentos)
-000038 9a38                      	SBI DDRC, DDC0    // PC0 salida
-000039 9840                          CBI PORTC, PORTC0
-00003a 9a39                      	SBI DDRC, DDC1    // PC1 salida
-00003b 9841                          CBI PORTC, PORTC1
-00003c 9a3a                      	SBI DDRC, DDC2    // PC2 salida
-00003d 9842                          CBI PORTC, PORTC2
-00003e 9a3b                      	SBI DDRC, DDC3    // PC3 salida
-00003f 9843                          CBI PORTC, PORTC3
-000040 9a3c                      	SBI DDRC, DDC4    // PC4 salida
-000041 9844                          CBI PORTC, PORTC4
-000042 9a3d                      	SBI DDRC, DDC5    // PC5 salida
-000043 9845                          CBI PORTC, PORTC5
-000044 9a52                      	SBI DDRD, DDD2    // PD2 Salida
-000045 985a                          CBI PORTD, PORTD2 
+000040 9a38                      	SBI DDRC, DDC0    // PC0 salida
+000041 9840                          CBI PORTC, PORTC0
+000042 9a39                      	SBI DDRC, DDC1    // PC1 salida
+000043 9841                          CBI PORTC, PORTC1
+000044 9a3a                      	SBI DDRC, DDC2    // PC2 salida
+000045 9842                          CBI PORTC, PORTC2
+000046 9a3b                      	SBI DDRC, DDC3    // PC3 salida
+000047 9843                          CBI PORTC, PORTC3
+000048 9a3c                      	SBI DDRC, DDC4    // PC4 salida
+000049 9844                          CBI PORTC, PORTC4
+00004a 9a3d                      	SBI DDRC, DDC5    // PC5 salida
+00004b 9845                          CBI PORTC, PORTC5
+00004c 9a52                      	SBI DDRD, DDD2    // PD2 Salida
+00004d 985a                          CBI PORTD, PORTD2 
                                  	// Salidas para habilitar que display actualizar (PD3-PD6)
-000046 9a53                      	SBI DDRD, DDD3    // PD3 Salida
-000047 985b                          CBI PORTD, PORTD3 
-000048 9a54                      	SBI DDRD, DDD4    // PD4 Salida
-000049 985c                          CBI PORTD, PORTD4
-00004a 9a55                      	SBI DDRD, DDD5    // PD5 Salida
-00004b 985d                          CBI PORTD, PORTD5 
-00004c 9a56                      	SBI DDRD, DDD6    // PD6 Salida
-00004d 985e                          CBI PORTD, PORTD6  
+00004e 9a53                      	SBI DDRD, DDD3    // PD3 Salida
+00004f 985b                          CBI PORTD, PORTD3 
+000050 9a54                      	SBI DDRD, DDD4    // PD4 Salida
+000051 985c                          CBI PORTD, PORTD4
+000052 9a55                      	SBI DDRD, DDD5    // PD5 Salida
+000053 985d                          CBI PORTD, PORTD5 
+000054 9a56                      	SBI DDRD, DDD6    // PD6 Salida
+000055 985e                          CBI PORTD, PORTD6  
                                  
-                                     // Configuraci?n Timer0 para 10ms en modo CTC
-00004e e002                          LDI R16, (1 << WGM01)    ; Modo CTC (Clear Timer on Compare Match)
-00004f bd04                          OUT TCCR0A, R16
-                                     
-                                     // Configurar valor de comparaci?n para 10ms con prescaler 1024
-                                     // Frecuencia = 16MHz / 1024 = 15625 Hz
-                                     // Para 10ms: 15625 * 0.01 = 156.25 ciclos ? 156
-000050 e90b                          LDI R16, 155              // Valor de comparaci?n (OCR0A)
-000051 bd07                          OUT OCR0A, R16
-                                     
-000052 e005                          LDI R16, (1 << CS02) | (1 << CS00) // Prescaler 1024
-000053 bd05                          OUT TCCR0B, R16
+                                 	// Configuración Timer1 para 1 minuto en modo CTC ----------------------------------------------------------------------------------
                                  
-                                     // Configurar interrupci?n del TIMER0 por COMPARE MATCH A
-000054 e002                          LDI R16, (1 << OCIE0A)    // Habilita interrupci?n por comparaci?n
-000055 9300 006e                     STS TIMSK0, R16
+                                 
+                                 	// Configurar modo CTC (WGM12=1) y prescaler 1024 (CS12=1, CS10=1)
+000056 e00d                      	LDI R16, (1 << WGM12) | (1 << CS12) | (0 << CS11) | (1 << CS10)
+000057 9300 0081                 	STS TCCR1B, R16
+                                 
+                                 	// Cargar OCR1A con 15625 (0x3D09) (para 16 MHz)
+                                 	
+000059 e30d                      	LDI R16, 0x3D
+00005a 9300 0089                 	STS OCR1AH, R16
+00005c e009                      	LDI R16, 0x09
+00005d 9300 0088                 	STS OCR1AL, R16
+                                 
+                                 
+                                 	// Inicializar TCNT1 a 0
+00005f 2700                      	CLR R16
+000060 9300 0085                 	STS TCNT1H, R16
+000062 9300 0084                 	STS TCNT1L, R16
+                                 
+000064 e002                      	LDI R16, (1 << OCIE1A)
+000065 9300 006f                     STS TIMSK1, R16
                                  
                                      // Inicializar registros
-000057 2700                          CLR R16		//
-000058 2711                          CLR R17		// Contador de ciclos timer 10ms
-000059 2722                          CLR R18		// Cuenta unidades Minutos
-00005a 2733                      	CLR R19		
-00005b 2744                      	CLR R20		// Se usa Zhigh eb DIPLAY
-00005c 2755                          CLR R21		// Seleciona Display
-00005d 2766                      	CLR R22		// Cuenta Decenas Minutos
-00005e 2777                      	CLR R23		// Valor a buscar en el .db
-00005f 2788                      	CLR R24		// Cuenta HORAS
-000060 2799                      	CLR R25		// Agarra los valores de R23 Para Actualizar el display
-000061 27aa                      	CLR R26		// Decenas de HORAS
-000062 9478                          SEI        // Habilitar interrupciones globales
+000067 2700                          CLR R16		//
+000068 2711                          CLR R17		// Contador de segundos
+000069 2722                          CLR R18		// Cuenta unidades Minutos
+00006a 2733                      	CLR R19		
+00006b 2744                      	CLR R20		// Se usa Zhigh eb DIPLAY
+00006c 2755                          CLR R21		// Seleciona Display
+00006d 2766                      	CLR R22		// Cuenta Decenas Minutos
+00006e 2777                      	CLR R23		// Valor a buscar en el .db
+00006f 2788                      	CLR R24		// Cuenta HORAS
+000070 2799                      	CLR R25		// Agarra los valores de R23 Para Actualizar el display
+000071 27aa                      	CLR R26		// Decenas de HORAS
                                  
-                                 //-------------------------------------------------------------------------------------
+000072 9478                          SEI        // Habilitar interrupciones globales
+                                 
+                                 //------------------------------------------------------------------------------------- ACABA CONFIG----------------------------------------------------------------------------------------
                                  
                                  MAIN_LOOP:
-000063 940e 00a4                     CALL TIEMPO
-000065 9553                      	INC R21 //Va haciendo na cuenta para actulizar los contadores individualmente
-000066 3054                          CPI R21, 4    
-000067 f008                          BRLO DISPSEL     // Si R21 < 4, está bien
-000068 2755                          CLR R21          // Si R21 >= 4, resetea a 0
+000073 940e 00b4                     CALL TIEMPO
+000075 9553                      	INC R21 //Va haciendo na cuenta para actulizar los contadores individualmente
+000076 3054                          CPI R21, 4    
+000077 f008                          BRLO DISPSEL     // Si R21 < 4, está bien
+000078 2755                          CLR R21          // Si R21 >= 4, resetea a 0
                                  DISPSEL:
-000069 940e 006c                 	CALL DISPLAYSEL
-00006b cff7                          RJMP MAIN_LOOP
+000079 940e 007c                 	CALL DISPLAYSEL
+00007b cff7                          RJMP MAIN_LOOP
                                  
                                  DISPLAYSEL:
                                  
-00006c 3050                          CPI R21, 0 // Compara con 0
-00006d f031                          BREQ DISP0 // Salta a DISP0 si R21 = 0
-00006e 3051                          CPI R21, 1 // Compara con 1
-00006f f051                          BREQ DISP1 // Salta a DISP1 si R21 = 1
-000070 3052                          CPI R21, 2 // Compara con 2
-000071 f071                          BREQ DISP2 // Salta a DISP2 si R21 = 2
-000072 3053                          CPI R21, 3 // Compara con 3
-000073 f091                          BREQ DISP3 // Salta a DISP3 si R21 = 3
+00007c 3050                          CPI R21, 0 // Compara con 0
+00007d f031                          BREQ DISP0 // Salta a DISP0 si R21 = 0
+00007e 3051                          CPI R21, 1 // Compara con 1
+00007f f051                          BREQ DISP1 // Salta a DISP1 si R21 = 1
+000080 3052                          CPI R21, 2 // Compara con 2
+000081 f071                          BREQ DISP2 // Salta a DISP2 si R21 = 2
+000082 3053                          CPI R21, 3 // Compara con 3
+000083 f091                          BREQ DISP3 // Salta a DISP3 si R21 = 3
                                  	//nunca deberia pasar sin saltar
                                  
                                  DISP0:
-000074 985c                          CBI PORTD, 4    // Apaga PD4
-000075 985d                          CBI PORTD, 5    // Apaga PD5
-000076 985e                          CBI PORTD, 6    // Apaga PD6
-000077 9a5b                          SBI PORTD, 3    // Enciende PD3 (DISP0)
-000078 2f72                      	MOV R23, R18	// Cuenta de Unidades S a R23
-000079 c012                      	RJMP DISPLAY
+000084 985c                          CBI PORTD, 4    // Apaga PD4
+000085 985d                          CBI PORTD, 5    // Apaga PD5
+000086 985e                          CBI PORTD, 6    // Apaga PD6
+000087 9a5b                          SBI PORTD, 3    // Enciende PD3 (DISP0)
+000088 2f72                      	MOV R23, R18	// Cuenta de Unidades S a R23
+000089 c012                      	RJMP DISPLAY
                                  
                                  DISP1:
-00007a 985b                          CBI PORTD, 3    // Apaga PD3
-00007b 985d                          CBI PORTD, 5    // Apaga PD5
-00007c 985e                          CBI PORTD, 6    // Apaga PD6
-00007d 9a5c                          SBI PORTD, 4    // Enciende PD4 (DISP1)
-00007e 2f76                      	MOV R23, R22	// Cuenta de Decenas S a R23
-00007f c00c                          RJMP DISPLAY
+00008a 985b                          CBI PORTD, 3    // Apaga PD3
+00008b 985d                          CBI PORTD, 5    // Apaga PD5
+00008c 985e                          CBI PORTD, 6    // Apaga PD6
+00008d 9a5c                          SBI PORTD, 4    // Enciende PD4 (DISP1)
+00008e 2f76                      	MOV R23, R22	// Cuenta de Decenas S a R23
+00008f c00c                          RJMP DISPLAY
                                  
                                  DISP2:
-000080 985b                          CBI PORTD, 3    // Apaga PD3
-000081 985c                          CBI PORTD, 4    // Apaga PD4
-000082 985e                          CBI PORTD, 6    // Apaga PD6
-000083 9a5d                          SBI PORTD, 5    // Enciende PD5 (DISP2)
-000084 2f78                      	MOV R23, R24	// Cuenta de Unidades S a R23
-000085 c006                          RJMP DISPLAY
+000090 985b                          CBI PORTD, 3    // Apaga PD3
+000091 985c                          CBI PORTD, 4    // Apaga PD4
+000092 985e                          CBI PORTD, 6    // Apaga PD6
+000093 9a5d                          SBI PORTD, 5    // Enciende PD5 (DISP2)
+000094 2f78                      	MOV R23, R24	// Cuenta de Unidades S a R23
+000095 c006                          RJMP DISPLAY
                                  
                                  DISP3:
-000086 985b                          CBI PORTD, 3    // Apaga PD3
-000087 985c                          CBI PORTD, 4    // Apaga PD4
-000088 985d                          CBI PORTD, 5    // Apaga PD5
-000089 9a5e                          SBI PORTD, 6    // Enciende PD6 (DISP3)
-00008a 2f7a                      	MOV R23, R26	// Cuenta de Decenas S a R23
-00008b c000                          RJMP DISPLAY
+000096 985b                          CBI PORTD, 3    // Apaga PD3
+000097 985c                          CBI PORTD, 4    // Apaga PD4
+000098 985d                          CBI PORTD, 5    // Apaga PD5
+000099 9a5e                          SBI PORTD, 6    // Enciende PD6 (DISP3)
+00009a 2f7a                      	MOV R23, R26	// Cuenta de Decenas S a R23
+00009b c000                          RJMP DISPLAY
                                  
                                  DISPLAY:
-00008c 93ff                      	PUSH ZH
-00008d 93ef                          PUSH ZL
+00009c 93ff                      	PUSH ZH
+00009d 93ef                          PUSH ZL
                                  
-00008e e0f1                          LDI ZH, HIGH(disp7seg << 1)
-00008f e8ec                          LDI ZL, LOW(disp7seg << 1)
+00009e e0f1                          LDI ZH, HIGH(disp7seg << 1)
+00009f eaee                          LDI ZL, LOW(disp7seg << 1)
                                  
                                  	// busca los valores para el 7 segmentos
-000090 0f77                      	lsl R23		//mueve los bits a la iz (multiplica por 2)
-000091 0fe7                      	ADD ZL, R23
-000092 e040                      	LDI R20, 0
-000093 1ff4                      	ADC ZH, R20
-000094 9174                      	LPM R23, Z
-000095 91ef                      	POP ZL
-000096 91ff                          POP ZH
+0000a0 0f77                      	lsl R23		//mueve los bits a la iz (multiplica por 2)
+0000a1 0fe7                      	ADD ZL, R23
+0000a2 e040                      	LDI R20, 0
+0000a3 1ff4                      	ADC ZH, R20
+0000a4 9174                      	LPM R23, Z
+0000a5 91ef                      	POP ZL
+0000a6 91ff                          POP ZH
                                  
                                  	//Actualiza todo el portC (6 segmentos)
-000097 2f97                      	MOV R25, R23
-000098 b998                      	OUT PORTC, R25  
+0000a7 2f97                      	MOV R25, R23
+0000a8 b998                      	OUT PORTC, R25  
                                  	//Actualiza el ultimo segmento
-000099 fd96                      	SBRC R25, 6
-00009a 9a5a                          SBI PORTD, PORTD2
-00009b ff96                          SBRS R25, 6
-00009c 985a                          CBI PORTD, PORTD2
+0000a9 fd96                      	SBRC R25, 6
+0000aa 9a5a                          SBI PORTD, PORTD2
+0000ab ff96                          SBRS R25, 6
+0000ac 985a                          CBI PORTD, PORTD2
                                  
                                  	//Limpia para que no afecte los otros diplays
-00009d 2799                      	CLR R25
-00009e b998                      	OUT PORTC, R25  
+0000ad 2799                      	CLR R25
+0000ae b998                      	OUT PORTC, R25  
                                  	//Actualiza el ultimo segmento
-00009f fd96                      	SBRC R25, 6
-0000a0 9a5a                          SBI PORTD, PORTD2
-0000a1 ff96                          SBRS R25, 6
-0000a2 985a                          CBI PORTD, PORTD2 
-0000a3 9508                      RET
+0000af fd96                      	SBRC R25, 6
+0000b0 9a5a                          SBI PORTD, PORTD2
+0000b1 ff96                          SBRS R25, 6
+0000b2 985a                          CBI PORTD, PORTD2 
+0000b3 9508                      RET
                                  
                                  
                                  TIEMPO:
+                                 	
+0000b4 331b                      	CPI R17, 59 //segundos
+0000b5 f0b8                          BRLO TIMER_RET
+0000b6 2711                      	CLR R17
                                  
-0000a4 3012                          CPI R17, 2 //100 10 para test
-0000a5 f0b8                          BRLO TIMER_RET //Cuenta los 10ms
-0000a6 2711                          CLR R17
+                                 	//Unidades de Minutos
+0000b7 9523                      	INC R18
+0000b8 302a                          CPI R18, 10
+0000b9 f098                          BRLO TIMER_RET
+0000ba 2722                      	CLR R18
                                  
-0000a7 9523                          INC R18			//Unidades de Minutos
-0000a8 302a                          CPI R18, 10
-0000a9 f098                          BRLO TIMER_RET
-0000aa 2722                      	CLR R18
+0000bb 9563                      	INC R22			//Decenas de Minutos
+0000bc 3066                      	CPI R22, 6
+0000bd f078                      	BRLO TIMER_RET
+0000be 2766                      	CLR R22
                                  
-0000ab 9563                      	INC R22			//Decenas de Minutos
-0000ac 3066                      	CPI R22, 6
-0000ad f078                      	BRLO TIMER_RET
-0000ae 2766                      	CLR R22
-                                 
-0000af 9583                      	INC R24			//Unidades de Horas
-0000b0 30a2                      	CPI R26, 2
-0000b1 f421                      	BRNE ZEROoDIEZ
-0000b2 3084                      	CPI R24, 4
-0000b3 f048                      	BRLO TIMER_RET
-0000b4 2788                      	CLR R24
-0000b5 c003                      	RJMP DECENASdeHORAS
+0000bf 9583                      	INC R24			//Unidades de Horas
+0000c0 30a2                      	CPI R26, 2	
+0000c1 f421                      	BRNE ZEROoDIEZ // revisa que no ha llegado a 20
+0000c2 3084                      	CPI R24, 4
+0000c3 f048                      	BRLO TIMER_RET
+0000c4 2788                      	CLR R24
+0000c5 c003                      	RJMP DECENASdeHORAS
                                  ZEROoDIEZ:
-0000b6 308a                      	CPI R24, 10
-0000b7 f028                      	BRLO TIMER_RET
-0000b8 2788                      	CLR R24
+0000c6 308a                      	CPI R24, 10
+0000c7 f028                      	BRLO TIMER_RET
+0000c8 2788                      	CLR R24
                                  
                                  DECENASdeHORAS:
-0000b9 95a3                      	INC R26			//Decenas de Horas
-0000ba 30a3                      	CPI R26, 3
-0000bb f008                      	BRLO TIMER_RET
-0000bc 27aa                      	CLR R26
+0000c9 95a3                      	INC R26			//Decenas de Horas
+0000ca 30a3                      	CPI R26, 3
+0000cb f008                      	BRLO TIMER_RET
+0000cc 27aa                      	CLR R26
                                  
                                  TIMER_RET:
-0000bd 9508                          RET
+0000cd 9508                          RET
                                  
-                                 // Rutina de interrupci?n del Timer0 - Modo COMPARE MATCH
-                                 TIMER0_COMPA:
-0000be 930f                          PUSH R16
-0000bf b70f                          IN R16, SREG
-0000c0 930f                          PUSH R16
+                                 
+                                 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
+                                 TIMER1_COMPA:      
+0000ce 930f                          PUSH R16
+0000cf b70f                          IN R16, SREG
+0000d0 930f                          PUSH R16
                                      
-0000c1 9513                          INC R17                 // Incrementar contador de ciclos
-                                     
-0000c2 910f                          POP R16
-0000c3 bf0f                          OUT SREG, R16
-0000c4 910f                          POP R16
-0000c5 9518                          RETI
+0000d1 9513                          INC R17                 // Incrementar contador de ciclos
+0000d2 9a1d                      	SBI PINB, PINB5
+                                 
+0000d3 910f                      	POP R16      
+0000d4 bf0f                      	OUT SREG, R16 
+0000d5 910f                      	POP R16     
+0000d6 9518                      	RETI
                                  
                                  // Tabla para display de 7 segmentos (referencia)
                                  disp7seg:
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(227): warning: .cseg .db misalignment - padding zero byte
-0000c6 003f                          .db 0b00111111 // 0
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(228): warning: .cseg .db misalignment - padding zero byte
-0000c7 0006                          .db 0b00000110 // 1
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(229): warning: .cseg .db misalignment - padding zero byte
-0000c8 005b                          .db 0b01011011 // 2
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(230): warning: .cseg .db misalignment - padding zero byte
-0000c9 004f                          .db 0b01001111 // 3
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(231): warning: .cseg .db misalignment - padding zero byte
-0000ca 0066                          .db 0b01100110 // 4
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(232): warning: .cseg .db misalignment - padding zero byte
-0000cb 006d                          .db 0b01101101 // 5
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(233): warning: .cseg .db misalignment - padding zero byte
-0000cc 007d                          .db 0b01111101 // 6
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(234): warning: .cseg .db misalignment - padding zero byte
-0000cd 0007                          .db 0b00000111 // 7
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(235): warning: .cseg .db misalignment - padding zero byte
-0000ce 007f                          .db 0b01111111 // 8
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(236): warning: .cseg .db misalignment - padding zero byte
-0000cf 0067                          .db 0b01100111 // 9
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(237): warning: .cseg .db misalignment - padding zero byte
-0000d0 0077                          .db 0b01110111 // A
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(238): warning: .cseg .db misalignment - padding zero byte
-0000d1 007c                          .db 0b01111100 // b
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(239): warning: .cseg .db misalignment - padding zero byte
-0000d2 0039                          .db 0b00111001 // C
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(240): warning: .cseg .db misalignment - padding zero byte
-0000d3 005e                          .db 0b01011110 // d
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(241): warning: .cseg .db misalignment - padding zero byte
-0000d4 0079                          .db 0b01111001 // E
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(242): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(248): warning: .cseg .db misalignment - padding zero byte
+0000d7 003f                          .db 0b00111111 // 0
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(249): warning: .cseg .db misalignment - padding zero byte
+0000d8 0006                          .db 0b00000110 // 1
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(250): warning: .cseg .db misalignment - padding zero byte
+0000d9 005b                          .db 0b01011011 // 2
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(251): warning: .cseg .db misalignment - padding zero byte
+0000da 004f                          .db 0b01001111 // 3
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(252): warning: .cseg .db misalignment - padding zero byte
+0000db 0066                          .db 0b01100110 // 4
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(253): warning: .cseg .db misalignment - padding zero byte
+0000dc 006d                          .db 0b01101101 // 5
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(254): warning: .cseg .db misalignment - padding zero byte
+0000dd 007d                          .db 0b01111101 // 6
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(255): warning: .cseg .db misalignment - padding zero byte
+0000de 0007                          .db 0b00000111 // 7
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(256): warning: .cseg .db misalignment - padding zero byte
+0000df 007f                          .db 0b01111111 // 8
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(257): warning: .cseg .db misalignment - padding zero byte
+0000e0 0067                          .db 0b01100111 // 9
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(258): warning: .cseg .db misalignment - padding zero byte
+0000e1 0077                          .db 0b01110111 // A
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(259): warning: .cseg .db misalignment - padding zero byte
+0000e2 007c                          .db 0b01111100 // b
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(260): warning: .cseg .db misalignment - padding zero byte
+0000e3 0039                          .db 0b00111001 // C
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(261): warning: .cseg .db misalignment - padding zero byte
+0000e4 005e                          .db 0b01011110 // d
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(262): warning: .cseg .db misalignment - padding zero byte
+0000e5 0079                          .db 0b01111001 // E
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(263): warning: .cseg .db misalignment - padding zero byte
 
 
 RESOURCE USE INFORMATION
@@ -1305,7 +1326,7 @@ counted separately from r26..r31 here.
 "ATmega328P" register use summary:
 x  :   0 y  :   0 z  :   1 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  19 r17:   4 r18:   5 r19:   1 r20:   3 
+r13:   0 r14:   0 r15:   0 r16:  26 r17:   4 r18:   5 r19:   1 r20:   3 
 r21:   8 r22:   5 r23:   9 r24:   7 r25:   9 r26:   6 r27:   0 r28:   0 
 r29:   0 r30:   4 r31:   4 
 Registers used: 14 out of 35 (40.0%)
@@ -1316,26 +1337,26 @@ andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0
 brcc  :   0 brcs  :   0 break :   0 breq  :   4 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   7 brlt  :   0 brmi  :   0 
 brne  :   1 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   2 cbi   :  25 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  19 cls   :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :   2 cbi   :  26 cbr   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  20 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
 cpi   :  12 cpse  :   0 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   1 inc   :   6 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :   9 lds   :   0 lpm   :   2 lsl   :   1 
+ld    :   0 ldd   :   0 ldi   :  11 lds   :   0 lpm   :   2 lsl   :   1 
 lsr   :   0 mov   :   5 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   8 pop   :   4 
+neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   5 pop   :   4 
 push  :   4 rcall :   0 ret   :   2 reti  :   1 rjmp  :   8 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :  17 sbic  :   0 sbis  :   0 
+ror   :   0 sbc   :   0 sbci  :   0 sbi   :  19 sbic  :   0 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   2 sbrs  :   2 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   1 
+sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   8 
 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
 Instructions used: 26 out of 113 (23.0%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0001ac    296     32    328   32768   1.0%
+[.cseg] 0x000000 0x0001ce    330     32    362   32768   1.1%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

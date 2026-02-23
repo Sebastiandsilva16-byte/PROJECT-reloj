@@ -11,8 +11,9 @@
 .cseg
 .org 0x0000
     RJMP SETUP
-.org 0x0020          // Vector de interrupci?n para TIMER0_COMPA (modo CTC)
-    RJMP TIMER0_COMPA
+.org 0x0016         // Vector de interrupción para TIMER1_COMPA (NUEVO)
+    RJMP TIMER1_COMPA
+
 
 
 .org 0x0034
@@ -23,6 +24,16 @@ SETUP:
     OUT     SPL, R16
     LDI     R16, HIGH(RAMEND)
     OUT     SPH, R16
+		
+// ------------------------------------
+	SBI DDRB, DDB5    // led para probar
+    CBI PORTB, PORTB5
+
+	WDT_disable:
+    LDI R16, (1<<WDCE) | (1<<WDE)
+    STS WDTCSR, R16
+    LDI R16, (0<<WDE)
+    STS WDTCSR, R16
 
 	// Salidas LEDs (PC0-PC5) y (PD3) (apagados) (7 segmentos)
 	SBI DDRC, DDC0    // PC0 salida
@@ -49,26 +60,32 @@ SETUP:
 	SBI DDRD, DDD6    // PD6 Salida
     CBI PORTD, PORTD6  
 
-    // Configuraci?n Timer0 para 10ms en modo CTC
-    LDI R16, (1 << WGM01)    ; Modo CTC (Clear Timer on Compare Match)
-    OUT TCCR0A, R16
-    
-    // Configurar valor de comparaci?n para 10ms con prescaler 1024
-    // Frecuencia = 16MHz / 1024 = 15625 Hz
-    // Para 10ms: 15625 * 0.01 = 156.25 ciclos ? 156
-    LDI R16, 155              // Valor de comparaci?n (OCR0A)
-    OUT OCR0A, R16
-    
-    LDI R16, (1 << CS02) | (1 << CS00) // Prescaler 1024
-    OUT TCCR0B, R16
+	// Configuración Timer1 para 1 minuto en modo CTC ----------------------------------------------------------------------------------
 
-    // Configurar interrupci?n del TIMER0 por COMPARE MATCH A
-    LDI R16, (1 << OCIE0A)    // Habilita interrupci?n por comparaci?n
-    STS TIMSK0, R16
+
+	// Configurar modo CTC (WGM12=1) y prescaler 1024 (CS12=1, CS10=1) (ya cuenta 1 min aprox)
+	LDI R16, (1 << WGM12) | (1 << CS12) | (0 << CS11) | (1 << CS10)
+	STS TCCR1B, R16
+
+	// Cargar OCR1A con 15625 (0x3D09) (para 16 MHz)
+	
+	LDI R16, 0x3D
+	STS OCR1AH, R16
+	LDI R16, 0x09
+	STS OCR1AL, R16
+
+
+	// Inicializar TCNT1 a 0
+	CLR R16
+	STS TCNT1H, R16
+	STS TCNT1L, R16
+
+	LDI R16, (1 << OCIE1A)
+    STS TIMSK1, R16
 
     // Inicializar registros
     CLR R16		//
-    CLR R17		// Contador de ciclos timer 10ms
+    CLR R17		// Contador de segundos
     CLR R18		// Cuenta unidades Minutos
 	CLR R19		
 	CLR R20		// Se usa Zhigh eb DIPLAY
@@ -78,9 +95,10 @@ SETUP:
 	CLR R24		// Cuenta HORAS
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
 	CLR R26		// Decenas de HORAS
+
     SEI        // Habilitar interrupciones globales
 
-//-------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------- ACABA CONFIG----------------------------------------------------------------------------------------
 
 MAIN_LOOP:
     CALL TIEMPO
@@ -173,12 +191,13 @@ RET
 
 
 TIEMPO:
+	
+	CPI R17, 59 //segundos
+    BRLO TIMER_RET
+	CLR R17
 
-    CPI R17, 1 //100 10 para test
-    BRLO TIMER_RET //Cuenta los 10ms
-    CLR R17
-
-    INC R18			//Unidades de Minutos
+	//Unidades de Minutos
+	INC R18
     CPI R18, 10
     BRLO TIMER_RET
 	CLR R18
@@ -209,18 +228,20 @@ DECENASdeHORAS:
 TIMER_RET:
     RET
 
-// Rutina de interrupci?n del Timer0 - Modo COMPARE MATCH
-TIMER0_COMPA:
+
+// Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
+TIMER1_COMPA:      
     PUSH R16
     IN R16, SREG
     PUSH R16
     
     INC R17                 // Incrementar contador de ciclos
-    
-    POP R16
-    OUT SREG, R16
-    POP R16
-    RETI
+	SBI PINB, PINB5
+
+	POP R16      
+	OUT SREG, R16 
+	POP R16     
+	RETI
 
 // Tabla para display de 7 segmentos (referencia)
 disp7seg:

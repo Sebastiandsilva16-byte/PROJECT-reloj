@@ -23,20 +23,21 @@
   <FILE>PROJECT-reloj.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <SETUP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>20</LINE></SETUP>
-  <TIMER0_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>213</LINE></TIMER0_COMPA>
-  <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>85</LINE></MAIN_LOOP>
-  <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>175</LINE></TIEMPO>
-  <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>91</LINE></DISPSEL>
-  <DISPLAYSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>95</LINE></DISPLAYSEL>
-  <DISP0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>107</LINE></DISP0>
-  <DISP1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>115</LINE></DISP1>
-  <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>123</LINE></DISP2>
-  <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>131</LINE></DISP3>
-  <DISPLAY><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>139</LINE></DISPLAY>
-  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>226</LINE></disp7seg>
-  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>209</LINE></TIMER_RET>
-  <ZEROoDIEZ><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>198</LINE></ZEROoDIEZ>
-  <DECENASdeHORAS><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>203</LINE></DECENASdeHORAS>
+  <SETUP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>21</LINE></SETUP>
+  <TIMER1_COMPA><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>233</LINE></TIMER1_COMPA>
+  <WDT_disable><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>32</LINE></WDT_disable>
+  <MAIN_LOOP><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>103</LINE></MAIN_LOOP>
+  <TIEMPO><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>193</LINE></TIEMPO>
+  <DISPSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>109</LINE></DISPSEL>
+  <DISPLAYSEL><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>113</LINE></DISPLAYSEL>
+  <DISP0><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>125</LINE></DISP0>
+  <DISP1><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>133</LINE></DISP1>
+  <DISP2><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>141</LINE></DISP2>
+  <DISP3><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>149</LINE></DISP3>
+  <DISPLAY><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>157</LINE></DISPLAY>
+  <disp7seg><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>247</LINE></disp7seg>
+  <TIMER_RET><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>228</LINE></TIMER_RET>
+  <ZEROoDIEZ><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>217</LINE></ZEROoDIEZ>
+  <DECENASdeHORAS><FILE>C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm</FILE><LINE>222</LINE></DECENASdeHORAS>
  </LABELS>
 </ASSEMBLER_INFO>
