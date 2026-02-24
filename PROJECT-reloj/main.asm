@@ -1,7 +1,7 @@
 
 // Creado: 16/02/2026
 // Autor : Sebastian Da Silva
-// Descripci?n: Test del display de tiempo
+// Descripcion:Reloj proyecto
 
 .include "M328PDEF.inc"
 
@@ -63,11 +63,11 @@ SETUP:
 	// Configuración Timer1 para 1 minuto en modo CTC ----------------------------------------------------------------------------------
 
 
-	// Configurar modo CTC (WGM12=1) y prescaler 1024 (CS12=1, CS10=1) (ya cuenta 1 min aprox)
+	// Configurar modo CTC (WGM12=1) y prescaler 1024 (CS12=1, CS10=1) 
 	LDI R16, (1 << WGM12) | (1 << CS12) | (0 << CS11) | (1 << CS10)
 	STS TCCR1B, R16
 
-	// Cargar OCR1A con 15625 (0x3D09) (para 16 MHz)
+	// Cargar OCR1A (para 16 MHz) ( 15625 | 0x3D09) (ya cuenta 1 min aprox hay que revisar mejor)
 	
 	LDI R16, 0x3D
 	STS OCR1AH, R16
@@ -88,7 +88,7 @@ SETUP:
     CLR R17		// Contador de segundos
     CLR R18		// Cuenta unidades Minutos
 	CLR R19		
-	CLR R20		// Se usa Zhigh eb DIPLAY
+	CLR R20		
     CLR R21		// Seleciona Display
 	CLR R22		// Cuenta Decenas Minutos
 	CLR R23		// Valor a buscar en el .db
@@ -102,13 +102,20 @@ SETUP:
 
 MAIN_LOOP:
     CALL TIEMPO
-	INC R21 //Va haciendo na cuenta para actulizar los contadores individualmente
-    CPI R21, 4    
-    BRLO DISPSEL     // Si R21 < 4, está bien
-    CLR R21          // Si R21 >= 4, resetea a 0
+	CALL DISPF
+	RJMP MAIN_LOOP
+
+
+DISPF:
+    CPI R21, 4
+	BRLO DISPSEL     // Si R21 < 4, está bien
+    CLR R21          // Si R21 >= 4, resetea a 0    
+	RET
+
 DISPSEL:
 	CALL DISPLAYSEL
-    RJMP MAIN_LOOP
+	INC R21 //Va haciendo la cuenta para actulizar los contadores individualmente
+    RET
 
 DISPLAYSEL:
 
@@ -155,6 +162,7 @@ DISP3:
     RJMP DISPLAY
 
 DISPLAY:
+	PUSH R20
 	PUSH ZH
     PUSH ZL
 
@@ -167,8 +175,10 @@ DISPLAY:
 	LDI R20, 0
 	ADC ZH, R20
 	LPM R23, Z
+
 	POP ZL
     POP ZH
+	POP R20
 
 	//Actualiza todo el portC (6 segmentos)
 	MOV R25, R23
