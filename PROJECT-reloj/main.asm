@@ -11,8 +11,10 @@
 .cseg
 .org 0x0000
     RJMP SETUP
-.org 0x0016         // Vector de interrupción para TIMER1_COMPA (NUEVO)
-    RJMP TIMER1_COMPA
+.org 0x0008
+	RJMP INTBOTONES //interrpciones de botones portB
+.org 0x0016         
+    RJMP TIMER1_COMPA	// Vector de interrupción para TIMER1_COMPA 
 
 
 
@@ -35,7 +37,17 @@ SETUP:
     LDI R16, (0<<WDE)
     STS WDTCSR, R16
 
-	// Salidas LEDs (PC0-PC5) y (PD3) (apagados) (7 segmentos)
+	
+//input botones (pullup)
+	CBI DDRB, DDB0
+	SBI PORTB, PORTB0
+	CBI DDRB, DDB1
+	SBI PORTB, PORTB1
+	CBI DDRB, DDB2
+	SBI PORTB, PORTB2
+	CBI DDRB, DDB3
+	SBI PORTB, PORTB3
+// Salidas LEDs (PC0-PC5) y (PD3) (apagados) (7 segmentos)
 	SBI DDRC, DDC0    // PC0 salida
     CBI PORTC, PORTC0
 	SBI DDRC, DDC1    // PC1 salida
@@ -83,12 +95,21 @@ SETUP:
 	LDI R16, (1 << OCIE1A)
     STS TIMSK1, R16
 
+		
+	// Habilita interrupciones del puertoB --------------------------------
+	LDI r16, (1 << PCIE0)
+	STS PCICR, r16
+	// Botones PB0 -> PB3
+	LDI r16, (1 << PCINT0) | (1 << PCINT1) | (1 << PCINT2) | (1 << PCINT3)
+	STS PCMSK0, r16
+
+
     // Inicializar registros
     CLR R16		//
     CLR R17		// Contador de segundos
     CLR R18		// Cuenta unidades Minutos
-	CLR R19		
-	CLR R20		
+	CLR R19		// in del portb para saber el estado de los botones
+	CLR R20		// in pasado del portb
     CLR R21		// Seleciona Display
 	CLR R22		// Cuenta Decenas Minutos
 	CLR R23		// Valor a buscar en el .db
@@ -103,7 +124,37 @@ SETUP:
 MAIN_LOOP:
     CALL TIEMPO
 	CALL DISPF
+	CALL BOTONES
 	RJMP MAIN_LOOP
+
+BOTONES:
+	
+	CP R19, R20	
+	BRNE FINBOTONES
+	IN	R19, PINB
+	
+	SBRS R19, PB0
+	CALL boton_PB0
+	SBRS R19, PB1
+	CALL boton_PB1
+	SBRS R19, PB2
+	CALL boton_PB2
+	SBRS R19, PB3
+	CALL boton_PB3
+
+	FINBOTONES:
+	MOV R20, R19 //guarda el estado pasado de portb
+	RET
+
+boton_PB0:
+	SBI PINB, PINB5 
+	RET
+boton_PB1:
+	RET
+boton_PB2:
+	RET
+boton_PB3:
+	RET
 
 
 DISPF:
@@ -246,12 +297,28 @@ TIMER1_COMPA:
     PUSH R16
     
     INC R17                 // Incrementar contador de ciclos
-	SBI PINB, PINB5
-
+	IN R19, PINB			// Guarda el estado actual del portb
+	//SBI PINB, PINB5       //deshabilitado temporalmente
+ 
 	POP R16      
 	OUT SREG, R16 
 	POP R16     
 	RETI
+
+// Rutina de interrupci?n del PORTB
+INTBOTONES:
+	PUSH R16
+	IN R16, SREG
+	PUSH R16	
+	
+	IN	R19, PINB
+
+	POP R16
+	OUT SREG, R16
+	POP R16
+	RETI
+
+
 
 // Tabla para display de 7 segmentos (referencia)
 disp7seg:
