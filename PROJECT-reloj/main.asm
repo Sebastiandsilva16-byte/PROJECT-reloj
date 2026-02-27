@@ -118,17 +118,20 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
     // Inicializar registros
     CLR R16		//
     CLR R17		// Contador de segundos
-    CLR R18		// Cuenta unidades Minutos
+    CLR R18		// Cuenta unidades Minutos	 // y de DIAS
 	CLR R19		// in del portb para saber el estado de los botones
 	CLR R20		// in pasado del portb
     CLR R21		// Seleciona Display
-	CLR R22		// Cuenta Decenas Minutos
+	CLR R22		// Cuenta Decenas Minutos	 // y de DIAS
 	CLR R23		// Valor a buscar en el .db
-	CLR R24		// Cuenta HORAS
+	CLR R24		// Cuenta HORAS			     // y MES
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
-	CLR R26		// Decenas de HORAS
+	CLR R26		// Decenas de HORAS		     // y MES
 	CLR R27		// Carry
-
+	CLR R28
+	CLR R29
+	CLR R30		// Para Z low
+	CLR R31		// Para Z high
 
     SEI        // Habilitar interrupciones globales
 
@@ -313,7 +316,7 @@ DECENASdeHORAS:
 	INC R27
 
 TIMER_RET:
-
+	//Ahora cambio para hacer lo de las horas
 	STS unidadesMIN, R18    // Guardar Unidades de Minuto
     STS decenasMIN, R22     // Guardar Decenas de Minuto
     STS unidadesHOR, R24    // Guardar Unidades de Hora
@@ -327,6 +330,7 @@ TIMER_RET:
 	CPI R27, 0
 	BREQ TIMER_RET2	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
 	INC R18           // Si R27 está activo, sumar 1 a R18
+	CLR R27
 
 	// Verificar condiciones para saltar a 30dias
 	CPI R24, 4        // ¿R24 es 4 (abril)?
@@ -386,7 +390,7 @@ TIMER1_COMPA:
 	POP R16     
 	RETI
 
-// Rutina de interrupci?n del PORTB
+// Rutina de interrupcion del PORTB
 INTBOTONES:
 	PUSH R16
 	IN R16, SREG

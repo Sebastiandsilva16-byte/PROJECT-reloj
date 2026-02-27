@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Fri Feb 27 14:53:35 2026
+AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Fri Feb 27 14:59:55 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1054,9 +1054,9 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  .org 0x0000
 000000 c033                          RJMP SETUP
                                  .org 0x0008
-000008 c134                      	RJMP INTBOTONES //interrpciones de botones portB
+000008 c139                      	RJMP INTBOTONES //interrpciones de botones portB
                                  .org 0x0016         
-000016 c11d                          RJMP TIMER1_COMPA	// Vector de interrupción para TIMER1_COMPA 
+000016 c122                          RJMP TIMER1_COMPA	// Vector de interrupción para TIMER1_COMPA 
                                  
                                  
                                  
@@ -1149,322 +1149,326 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                      // Inicializar registros
 000072 2700                          CLR R16		//
 000073 2711                          CLR R17		// Contador de segundos
-000074 2722                          CLR R18		// Cuenta unidades Minutos
+000074 2722                          CLR R18		// Cuenta unidades Minutos	 // y de DIAS
 000075 2733                      	CLR R19		// in del portb para saber el estado de los botones
 000076 2744                      	CLR R20		// in pasado del portb
 000077 2755                          CLR R21		// Seleciona Display
-000078 2766                      	CLR R22		// Cuenta Decenas Minutos
+000078 2766                      	CLR R22		// Cuenta Decenas Minutos	 // y de DIAS
 000079 2777                      	CLR R23		// Valor a buscar en el .db
-00007a 2788                      	CLR R24		// Cuenta HORAS
+00007a 2788                      	CLR R24		// Cuenta HORAS			     // y MES
 00007b 2799                      	CLR R25		// Agarra los valores de R23 Para Actualizar el display
-00007c 27aa                      	CLR R26		// Decenas de HORAS
+00007c 27aa                      	CLR R26		// Decenas de HORAS		     // y MES
 00007d 27bb                      	CLR R27		// Carry
+00007e 27cc                      	CLR R28
+00007f 27dd                      	CLR R29
+000080 27ee                      	CLR R30		// Para Z low
+000081 27ff                      	CLR R31		// Para Z high
                                  
-                                 
-00007e 9478                          SEI        // Habilitar interrupciones globales
+000082 9478                          SEI        // Habilitar interrupciones globales
                                  
                                  //------------------------------------------------------------------------------------- ACABA CONFIG----------------------------------------------------------------------------------------
                                  
                                  MAIN_LOOP:
-00007f 940e 00e6                     CALL TIEMPO
-000081 940e 009c                 	CALL DISPF
-000083 940e 0086                 	CALL BOTONES
-000085 cff9                      	RJMP MAIN_LOOP
+000083 940e 00ea                     CALL TIEMPO
+000085 940e 00a0                 	CALL DISPF
+000087 940e 008a                 	CALL BOTONES
+000089 cff9                      	RJMP MAIN_LOOP
                                  
                                  BOTONES:
                                  	
-000086 1734                      	CP R19, R20	
-000087 f469                      	BRNE FINBOTONES
-000088 b133                      	IN	R19, PINB
+00008a 1734                      	CP R19, R20	
+00008b f469                      	BRNE FINBOTONES
+00008c b133                      	IN	R19, PINB
                                  	
-000089 ff30                      	SBRS R19, PB0
-00008a 940e 0097                 	CALL boton_PB0
-00008c ff31                      	SBRS R19, PB1
-00008d 940e 0099                 	CALL boton_PB1
-00008f ff32                      	SBRS R19, PB2
-000090 940e 009a                 	CALL boton_PB2
-000092 ff33                      	SBRS R19, PB3
-000093 940e 009b                 	CALL boton_PB3
+00008d ff30                      	SBRS R19, PB0
+00008e 940e 009b                 	CALL boton_PB0
+000090 ff31                      	SBRS R19, PB1
+000091 940e 009d                 	CALL boton_PB1
+000093 ff32                      	SBRS R19, PB2
+000094 940e 009e                 	CALL boton_PB2
+000096 ff33                      	SBRS R19, PB3
+000097 940e 009f                 	CALL boton_PB3
                                  
                                  	FINBOTONES:
-000095 2f43                      	MOV R20, R19 //guarda el estado pasado de portb
-000096 9508                      	RET
+000099 2f43                      	MOV R20, R19 //guarda el estado pasado de portb
+00009a 9508                      	RET
                                  
                                  boton_PB0:
-000097 9a1d                      	SBI PINB, PINB5 
-000098 9508                      	RET
+00009b 9a1d                      	SBI PINB, PINB5 
+00009c 9508                      	RET
                                  boton_PB1:
-000099 9508                      	RET
+00009d 9508                      	RET
                                  boton_PB2:
-00009a 9508                      	RET
+00009e 9508                      	RET
                                  boton_PB3:
-00009b 9508                      	RET
+00009f 9508                      	RET
                                  
                                  
                                  DISPF:
                                  	// -----------------------------------TEMPORAL
-00009c 9120 0100                 	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
-00009e 9160 0101                     LDS R22, decenasMIN     // Cargar Decenas de Minuto
-0000a0 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
-0000a2 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
+0000a0 9120 0100                 	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
+0000a2 9160 0101                     LDS R22, decenasMIN     // Cargar Decenas de Minuto
+0000a4 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
+0000a6 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
                                  	// -----------------------------------TEMPORAL
                                  
-0000a4 3054                          CPI R21, 4
-0000a5 f010                      	BRLO DISPSEL     // Si R21 < 4, está bien
-0000a6 2755                          CLR R21          // Si R21 >= 4, resetea a 0    
-0000a7 9508                      	RET
+0000a8 3054                          CPI R21, 4
+0000a9 f010                      	BRLO DISPSEL     // Si R21 < 4, está bien
+0000aa 2755                          CLR R21          // Si R21 >= 4, resetea a 0    
+0000ab 9508                      	RET
                                  
                                  DISPSEL:
-0000a8 940e 00ac                 	CALL DISPLAYSEL
-0000aa 9553                      	INC R21 //Va haciendo la cuenta para actulizar los contadores individualmente
-0000ab 9508                          RET
+0000ac 940e 00b0                 	CALL DISPLAYSEL
+0000ae 9553                      	INC R21 //Va haciendo la cuenta para actulizar los contadores individualmente
+0000af 9508                          RET
                                  
                                  DISPLAYSEL:
                                  
-0000ac 3050                          CPI R21, 0 // Compara con 0
-0000ad f031                          BREQ DISP0 // Salta a DISP0 si R21 = 0
-0000ae 3051                          CPI R21, 1 // Compara con 1
-0000af f051                          BREQ DISP1 // Salta a DISP1 si R21 = 1
-0000b0 3052                          CPI R21, 2 // Compara con 2
-0000b1 f071                          BREQ DISP2 // Salta a DISP2 si R21 = 2
-0000b2 3053                          CPI R21, 3 // Compara con 3
-0000b3 f091                          BREQ DISP3 // Salta a DISP3 si R21 = 3
+0000b0 3050                          CPI R21, 0 // Compara con 0
+0000b1 f031                          BREQ DISP0 // Salta a DISP0 si R21 = 0
+0000b2 3051                          CPI R21, 1 // Compara con 1
+0000b3 f051                          BREQ DISP1 // Salta a DISP1 si R21 = 1
+0000b4 3052                          CPI R21, 2 // Compara con 2
+0000b5 f071                          BREQ DISP2 // Salta a DISP2 si R21 = 2
+0000b6 3053                          CPI R21, 3 // Compara con 3
+0000b7 f091                          BREQ DISP3 // Salta a DISP3 si R21 = 3
                                  	//nunca deberia pasar sin saltar
                                  
                                  DISP0:
-0000b4 985c                          CBI PORTD, 4    // Apaga PD4
-0000b5 985d                          CBI PORTD, 5    // Apaga PD5
-0000b6 985e                          CBI PORTD, 6    // Apaga PD6
-0000b7 9a5b                          SBI PORTD, 3    // Enciende PD3 (DISP0)
-0000b8 2f72                      	MOV R23, R18	// Cuenta de Unidades S a R23
-0000b9 c012                      	RJMP DISPLAY
+0000b8 985c                          CBI PORTD, 4    // Apaga PD4
+0000b9 985d                          CBI PORTD, 5    // Apaga PD5
+0000ba 985e                          CBI PORTD, 6    // Apaga PD6
+0000bb 9a5b                          SBI PORTD, 3    // Enciende PD3 (DISP0)
+0000bc 2f72                      	MOV R23, R18	// Cuenta de Unidades S a R23
+0000bd c012                      	RJMP DISPLAY
                                  
                                  DISP1:
-0000ba 985b                          CBI PORTD, 3    // Apaga PD3
-0000bb 985d                          CBI PORTD, 5    // Apaga PD5
-0000bc 985e                          CBI PORTD, 6    // Apaga PD6
-0000bd 9a5c                          SBI PORTD, 4    // Enciende PD4 (DISP1)
-0000be 2f76                      	MOV R23, R22	// Cuenta de Decenas S a R23
-0000bf c00c                          RJMP DISPLAY
+0000be 985b                          CBI PORTD, 3    // Apaga PD3
+0000bf 985d                          CBI PORTD, 5    // Apaga PD5
+0000c0 985e                          CBI PORTD, 6    // Apaga PD6
+0000c1 9a5c                          SBI PORTD, 4    // Enciende PD4 (DISP1)
+0000c2 2f76                      	MOV R23, R22	// Cuenta de Decenas S a R23
+0000c3 c00c                          RJMP DISPLAY
                                  
                                  DISP2:
-0000c0 985b                          CBI PORTD, 3    // Apaga PD3
-0000c1 985c                          CBI PORTD, 4    // Apaga PD4
-0000c2 985e                          CBI PORTD, 6    // Apaga PD6
-0000c3 9a5d                          SBI PORTD, 5    // Enciende PD5 (DISP2)
-0000c4 2f78                      	MOV R23, R24	// Cuenta de Unidades S a R23
-0000c5 c006                          RJMP DISPLAY
+0000c4 985b                          CBI PORTD, 3    // Apaga PD3
+0000c5 985c                          CBI PORTD, 4    // Apaga PD4
+0000c6 985e                          CBI PORTD, 6    // Apaga PD6
+0000c7 9a5d                          SBI PORTD, 5    // Enciende PD5 (DISP2)
+0000c8 2f78                      	MOV R23, R24	// Cuenta de Unidades S a R23
+0000c9 c006                          RJMP DISPLAY
                                  
                                  DISP3:
-0000c6 985b                          CBI PORTD, 3    // Apaga PD3
-0000c7 985c                          CBI PORTD, 4    // Apaga PD4
-0000c8 985d                          CBI PORTD, 5    // Apaga PD5
-0000c9 9a5e                          SBI PORTD, 6    // Enciende PD6 (DISP3)
-0000ca 2f7a                      	MOV R23, R26	// Cuenta de Decenas S a R23
-0000cb c000                          RJMP DISPLAY
+0000ca 985b                          CBI PORTD, 3    // Apaga PD3
+0000cb 985c                          CBI PORTD, 4    // Apaga PD4
+0000cc 985d                          CBI PORTD, 5    // Apaga PD5
+0000cd 9a5e                          SBI PORTD, 6    // Enciende PD6 (DISP3)
+0000ce 2f7a                      	MOV R23, R26	// Cuenta de Decenas S a R23
+0000cf c000                          RJMP DISPLAY
                                  
                                  DISPLAY:
-0000cc 934f                      	PUSH R20
-0000cd 93ff                      	PUSH ZH
-0000ce 93ef                          PUSH ZL
+0000d0 934f                      	PUSH R20
+0000d1 93ff                      	PUSH ZH
+0000d2 93ef                          PUSH ZL
                                  
-0000cf e0f2                          LDI ZH, HIGH(disp7seg << 1)
-0000d0 e8ea                          LDI ZL, LOW(disp7seg << 1)
+0000d3 e0f2                          LDI ZH, HIGH(disp7seg << 1)
+0000d4 e9e4                          LDI ZL, LOW(disp7seg << 1)
                                  
                                  	// busca los valores para el 7 segmentos
-0000d1 0f77                      	LSL R23		//mueve los bits a la iz (multiplica por 2)
-0000d2 0fe7                      	ADD ZL, R23
-0000d3 e040                      	LDI R20, 0
-0000d4 1ff4                      	ADC ZH, R20
-0000d5 9174                      	LPM R23, Z
+0000d5 0f77                      	LSL R23		//mueve los bits a la iz (multiplica por 2)
+0000d6 0fe7                      	ADD ZL, R23
+0000d7 e040                      	LDI R20, 0
+0000d8 1ff4                      	ADC ZH, R20
+0000d9 9174                      	LPM R23, Z
                                  
-0000d6 91ef                      	POP ZL
-0000d7 91ff                          POP ZH
-0000d8 914f                      	POP R20
+0000da 91ef                      	POP ZL
+0000db 91ff                          POP ZH
+0000dc 914f                      	POP R20
                                  
                                  	//Actualiza todo el portC (6 segmentos)
-0000d9 2f97                      	MOV R25, R23
-0000da b998                      	OUT PORTC, R25  
+0000dd 2f97                      	MOV R25, R23
+0000de b998                      	OUT PORTC, R25  
                                  	//Actualiza el ultimo segmento
-0000db fd96                      	SBRC R25, 6
-0000dc 9a5a                          SBI PORTD, PORTD2
-0000dd ff96                          SBRS R25, 6
-0000de 985a                          CBI PORTD, PORTD2
+0000df fd96                      	SBRC R25, 6
+0000e0 9a5a                          SBI PORTD, PORTD2
+0000e1 ff96                          SBRS R25, 6
+0000e2 985a                          CBI PORTD, PORTD2
                                  
                                  	//Limpia para que no afecte los otros diplays
-0000df 2799                      	CLR R25
-0000e0 b998                      	OUT PORTC, R25  
+0000e3 2799                      	CLR R25
+0000e4 b998                      	OUT PORTC, R25  
                                  	//Actualiza el ultimo segmento
-0000e1 fd96                      	SBRC R25, 6
-0000e2 9a5a                          SBI PORTD, PORTD2
-0000e3 ff96                          SBRS R25, 6
-0000e4 985a                          CBI PORTD, PORTD2 
-0000e5 9508                      RET
+0000e5 fd96                      	SBRC R25, 6
+0000e6 9a5a                          SBI PORTD, PORTD2
+0000e7 ff96                          SBRS R25, 6
+0000e8 985a                          CBI PORTD, PORTD2 
+0000e9 9508                      RET
                                  
                                  
                                  TIEMPO:
                                  	
-0000e6 9120 0100                 	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
-0000e8 9160 0101                     LDS R22, decenasMIN     // Cargar Decenas de Minuto
-0000ea 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
-0000ec 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
+0000ea 9120 0100                 	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
+0000ec 9160 0101                     LDS R22, decenasMIN     // Cargar Decenas de Minuto
+0000ee 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
+0000f0 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
                                  
-0000ee 331b                      	CPI R17, 59 //segundos
-0000ef f0c0                          BRLO TIMER_RET
-0000f0 2711                      	CLR R17
+0000f2 331b                      	CPI R17, 59 //segundos
+0000f3 f0c0                          BRLO TIMER_RET
+0000f4 2711                      	CLR R17
                                  
                                  	//Unidades de Minutos
-0000f1 9523                      	INC R18
-0000f2 302a                          CPI R18, 10
-0000f3 f0a0                          BRLO TIMER_RET
-0000f4 2722                      	CLR R18
+0000f5 9523                      	INC R18
+0000f6 302a                          CPI R18, 10
+0000f7 f0a0                          BRLO TIMER_RET
+0000f8 2722                      	CLR R18
                                  
-0000f5 9563                      	INC R22			//Decenas de Minutos
-0000f6 3066                      	CPI R22, 6
-0000f7 f080                      	BRLO TIMER_RET
-0000f8 2766                      	CLR R22
+0000f9 9563                      	INC R22			//Decenas de Minutos
+0000fa 3066                      	CPI R22, 6
+0000fb f080                      	BRLO TIMER_RET
+0000fc 2766                      	CLR R22
                                  
-0000f9 9583                      	INC R24			//Unidades de Horas
-0000fa 30a2                      	CPI R26, 2	
-0000fb f421                      	BRNE ZEROoDIEZ // revisa que no ha llegado a 20
-0000fc 3084                      	CPI R24, 4
-0000fd f050                      	BRLO TIMER_RET
-0000fe 2788                      	CLR R24
-0000ff c003                      	RJMP DECENASdeHORAS
-                                 ZEROoDIEZ:
-000100 308a                      	CPI R24, 10
-000101 f030                      	BRLO TIMER_RET
+0000fd 9583                      	INC R24			//Unidades de Horas
+0000fe 30a2                      	CPI R26, 2	
+0000ff f421                      	BRNE ZEROoDIEZ // revisa que no ha llegado a 20
+000100 3084                      	CPI R24, 4
+000101 f050                      	BRLO TIMER_RET
 000102 2788                      	CLR R24
+000103 c003                      	RJMP DECENASdeHORAS
+                                 ZEROoDIEZ:
+000104 308a                      	CPI R24, 10
+000105 f030                      	BRLO TIMER_RET
+000106 2788                      	CLR R24
                                  
                                  DECENASdeHORAS:
-000103 95a3                      	INC R26			//Decenas de Horas
-000104 30a3                      	CPI R26, 3
-000105 f010                      	BRLO TIMER_RET
-000106 27aa                      	CLR R26
-000107 95b3                      	INC R27
+000107 95a3                      	INC R26			//Decenas de Horas
+000108 30a3                      	CPI R26, 3
+000109 f010                      	BRLO TIMER_RET
+00010a 27aa                      	CLR R26
+00010b 95b3                      	INC R27
                                  
                                  TIMER_RET:
-                                 
-000108 9320 0100                 	STS unidadesMIN, R18    // Guardar Unidades de Minuto
-00010a 9360 0101                     STS decenasMIN, R22     // Guardar Decenas de Minuto
-00010c 9380 0102                     STS unidadesHOR, R24    // Guardar Unidades de Hora
-00010e 93a0 0103                     STS decenasHOR, R26     // Guardar Decenas de Hora
-000110 9120 0104                 	LDS R18, unidadesDIA    // Cargar Unidades de DIA
-000112 9160 0105                     LDS R22, decenasDIA     // Cargar Decenas de DIA
-000114 9180 0106                     LDS R24, unidadesMES    // Cargar Unidades de MES
-000116 91a0 0107                     LDS R26, decenasMES     // Cargar Decenas de MES
+                                 	//Ahora cambio para hacer lo de las horas
+00010c 9320 0100                 	STS unidadesMIN, R18    // Guardar Unidades de Minuto
+00010e 9360 0101                     STS decenasMIN, R22     // Guardar Decenas de Minuto
+000110 9380 0102                     STS unidadesHOR, R24    // Guardar Unidades de Hora
+000112 93a0 0103                     STS decenasHOR, R26     // Guardar Decenas de Hora
+000114 9120 0104                 	LDS R18, unidadesDIA    // Cargar Unidades de DIA
+000116 9160 0105                     LDS R22, decenasDIA     // Cargar Decenas de DIA
+000118 9180 0106                     LDS R24, unidadesMES    // Cargar Unidades de MES
+00011a 91a0 0107                     LDS R26, decenasMES     // Cargar Decenas de MES
                                  
                                  	// Verificar carry (ya paso un dia?)
-000118 30b0                      	CPI R27, 0
-000119 f089                      	BREQ TIMER_RET2	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
-00011a 9523                      	INC R18           // Si R27 está activo, sumar 1 a R18
+00011c 30b0                      	CPI R27, 0
+00011d f091                      	BREQ TIMER_RET2	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
+00011e 9523                      	INC R18           // Si R27 está activo, sumar 1 a R18
+00011f 27bb                      	CLR R27
                                  
                                  	// Verificar condiciones para saltar a 30dias
-00011b 3084                      	CPI R24, 4        // ¿R24 es 4 (abril)?
-00011c f059                      	BREQ TREINTA_DIAS
-00011d 3086                      	CPI R24, 6        // ¿R24 es 6 (junio)?
-00011e f049                      	BREQ TREINTA_DIAS
-00011f 3089                      	CPI R24, 9        // ¿R24 es 9 (septiembre)?
-000120 f039                      	BREQ TREINTA_DIAS
+000120 3084                      	CPI R24, 4        // ¿R24 es 4 (abril)?
+000121 f059                      	BREQ TREINTA_DIAS
+000122 3086                      	CPI R24, 6        // ¿R24 es 6 (junio)?
+000123 f049                      	BREQ TREINTA_DIAS
+000124 3089                      	CPI R24, 9        // ¿R24 es 9 (septiembre)?
+000125 f039                      	BREQ TREINTA_DIAS
                                  
                                  	// Verificar si R26=1 y R24=1 (noviembre)
-000121 30a1                      	CPI R26, 1        // ¿R26 es 1?
-000122 f411                      	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
-000123 3081                      	CPI R24, 1        // ¿R24 es 1?
-000124 f019                      	BREQ TREINTA_DIAS // Si ambos son 1, saltar a 30dias
+000126 30a1                      	CPI R26, 1        // ¿R26 es 1?
+000127 f411                      	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
+000128 3081                      	CPI R24, 1        // ¿R24 es 1?
+000129 f019                      	BREQ TREINTA_DIAS // Si ambos son 1, saltar a 30dias
                                  
                                  	//Verificar condiciones para saltar a 28dias
                                  	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)
                                  	VERIFICAR_28:
-000125 3082                      	CPI R24, 2        // ¿R24 es 2 (febrero)?
-000126 f011                      	BREQ VEINTIOCHO_DIAS
+00012a 3082                      	CPI R24, 2        // ¿R24 es 2 (febrero)?
+00012b f011                      	BREQ VEINTIOCHO_DIAS
                                  
                                  	//Todos los otros meses tienen 31 dias
-000127 c002                      	RJMP TREINTA_Y_UN_DIAS
+00012c c002                      	RJMP TREINTA_Y_UN_DIAS
                                  
                                  	TREINTA_DIAS:
                                  	// Aquí va la lógica para meses de 30 días
-000128 c002                      	RJMP TIMER_RET2
+00012d c002                      	RJMP TIMER_RET2
                                  
                                  	VEINTIOCHO_DIAS:
                                  	// Aquí va la lógica para febrero (28 días)
-000129 c001                      	RJMP TIMER_RET2
+00012e c001                      	RJMP TIMER_RET2
                                  
                                  	TREINTA_Y_UN_DIAS:
                                  	// Aquí va la lógica para meses de 31 días
-00012a c000                      	RJMP TIMER_RET2
+00012f c000                      	RJMP TIMER_RET2
                                  
                                  	TIMER_RET2:
-00012b 9320 0104                 	STS unidadesDIA, R18    // Guardar Unidades de Minuto
-00012d 9360 0105                     STS decenasDIA, R22     // Guardar Decenas de Minuto
-00012f 9380 0106                     STS unidadesMES, R24    // Guardar Unidades de Hora
-000131 93a0 0107                     STS decenasMES, R26     // Guardar Decenas de Hora
-000133 9508                          RET
+000130 9320 0104                 	STS unidadesDIA, R18    // Guardar Unidades de Minuto
+000132 9360 0105                     STS decenasDIA, R22     // Guardar Decenas de Minuto
+000134 9380 0106                     STS unidadesMES, R24    // Guardar Unidades de Hora
+000136 93a0 0107                     STS decenasMES, R26     // Guardar Decenas de Hora
+000138 9508                          RET
                                  
                                  
                                  // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
                                  TIMER1_COMPA:      
-000134 930f                          PUSH R16
-000135 b70f                          IN R16, SREG
-000136 930f                          PUSH R16
+000139 930f                          PUSH R16
+00013a b70f                          IN R16, SREG
+00013b 930f                          PUSH R16
                                      
-000137 9513                          INC R17                 // Incrementar contador de ciclos
-000138 b133                      	IN R19, PINB			// Guarda el estado actual del portb
+00013c 9513                          INC R17                 // Incrementar contador de ciclos
+00013d b133                      	IN R19, PINB			// Guarda el estado actual del portb
                                  	//SBI PINB, PINB5       //deshabilitado temporalmente
                                   
-000139 910f                      	POP R16      
-00013a bf0f                      	OUT SREG, R16 
-00013b 910f                      	POP R16     
-00013c 9518                      	RETI
+00013e 910f                      	POP R16      
+00013f bf0f                      	OUT SREG, R16 
+000140 910f                      	POP R16     
+000141 9518                      	RETI
                                  
-                                 // Rutina de interrupci?n del PORTB
+                                 // Rutina de interrupcion del PORTB
                                  INTBOTONES:
-00013d 930f                      	PUSH R16
-00013e b70f                      	IN R16, SREG
-00013f 930f                      	PUSH R16	
+000142 930f                      	PUSH R16
+000143 b70f                      	IN R16, SREG
+000144 930f                      	PUSH R16	
                                  	
-000140 b133                      	IN	R19, PINB
+000145 b133                      	IN	R19, PINB
                                  
-000141 910f                      	POP R16
-000142 bf0f                      	OUT SREG, R16
-000143 910f                      	POP R16
-000144 9518                      	RETI
+000146 910f                      	POP R16
+000147 bf0f                      	OUT SREG, R16
+000148 910f                      	POP R16
+000149 9518                      	RETI
                                  
                                  
                                  
                                  // Tabla para display de 7 segmentos (referencia)
                                  disp7seg:
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(406): warning: .cseg .db misalignment - padding zero byte
-000145 003f                          .db 0b00111111 // 0
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(407): warning: .cseg .db misalignment - padding zero byte
-000146 0006                          .db 0b00000110 // 1
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(408): warning: .cseg .db misalignment - padding zero byte
-000147 005b                          .db 0b01011011 // 2
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(409): warning: .cseg .db misalignment - padding zero byte
-000148 004f                          .db 0b01001111 // 3
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(410): warning: .cseg .db misalignment - padding zero byte
-000149 0066                          .db 0b01100110 // 4
+00014a 003f                          .db 0b00111111 // 0
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(411): warning: .cseg .db misalignment - padding zero byte
-00014a 006d                          .db 0b01101101 // 5
+00014b 0006                          .db 0b00000110 // 1
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(412): warning: .cseg .db misalignment - padding zero byte
-00014b 007d                          .db 0b01111101 // 6
+00014c 005b                          .db 0b01011011 // 2
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(413): warning: .cseg .db misalignment - padding zero byte
-00014c 0007                          .db 0b00000111 // 7
+00014d 004f                          .db 0b01001111 // 3
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(414): warning: .cseg .db misalignment - padding zero byte
-00014d 007f                          .db 0b01111111 // 8
+00014e 0066                          .db 0b01100110 // 4
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(415): warning: .cseg .db misalignment - padding zero byte
-00014e 0067                          .db 0b01100111 // 9
+00014f 006d                          .db 0b01101101 // 5
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(416): warning: .cseg .db misalignment - padding zero byte
-00014f 0077                          .db 0b01110111 // A
+000150 007d                          .db 0b01111101 // 6
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(417): warning: .cseg .db misalignment - padding zero byte
-000150 007c                          .db 0b01111100 // b
+000151 0007                          .db 0b00000111 // 7
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(418): warning: .cseg .db misalignment - padding zero byte
-000151 0039                          .db 0b00111001 // C
+000152 007f                          .db 0b01111111 // 8
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(419): warning: .cseg .db misalignment - padding zero byte
-000152 005e                          .db 0b01011110 // d
+000153 0067                          .db 0b01100111 // 9
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(420): warning: .cseg .db misalignment - padding zero byte
-000153 0079                          .db 0b01111001 // E
+000154 0077                          .db 0b01110111 // A
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(421): warning: .cseg .db misalignment - padding zero byte
+000155 007c                          .db 0b01111100 // b
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(422): warning: .cseg .db misalignment - padding zero byte
+000156 0039                          .db 0b00111001 // C
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(423): warning: .cseg .db misalignment - padding zero byte
+000157 005e                          .db 0b01011110 // d
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(424): warning: .cseg .db misalignment - padding zero byte
+000158 0079                          .db 0b01111001 // E
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(425): warning: .cseg .db misalignment - padding zero byte
 
 
 RESOURCE USE INFORMATION
@@ -1485,9 +1489,9 @@ counted separately from r26..r31 here.
 x  :   0 y  :   0 z  :   1 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
 r13:   0 r14:   0 r15:   0 r16:  34 r17:   4 r18:  11 r19:  10 r20:   7 
-r21:   8 r22:  10 r23:   9 r24:  17 r25:   9 r26:  12 r27:   3 r28:   0 
-r29:   0 r30:   4 r31:   4 
-Registers used: 15 out of 35 (42.9%)
+r21:   8 r22:  10 r23:   9 r24:  17 r25:   9 r26:  12 r27:   4 r28:   1 
+r29:   1 r30:   5 r31:   5 
+Registers used: 17 out of 35 (48.6%)
 
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   1 add   :   1 adiw  :   0 and   :   0 
@@ -1496,7 +1500,7 @@ brcc  :   0 brcs  :   0 break :   0 breq  :  10 brge  :   0 brhc  :   0
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   7 brlt  :   0 brmi  :   0 
 brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   8 cbi   :  30 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  21 cls   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  26 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   1 cpc   :   0 
 cpi   :  19 cpse  :   0 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   5 inc   :   8 jmp   :   0 
@@ -1514,7 +1518,7 @@ Instructions used: 28 out of 113 (24.8%)
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0002aa    552     32    584   32768   1.8%
+[.cseg] 0x000000 0x0002b4    562     32    594   32768   1.8%
 [.dseg] 0x000100 0x000108      0      8      8    2048   0.4%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
