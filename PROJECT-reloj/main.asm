@@ -6,7 +6,18 @@
 .include "M328PDEF.inc"
 
 .dseg
-.org    SRAM_START
+.org  SRAM_START
+.dseg
+	.org 0x0100           
+	unidadesMIN:    .byte 1
+	decenasMIN:     .byte 1
+	unidadesHOR:    .byte 1
+	decenasHOR:     .byte 1
+	unidadesDIA:    .byte 1
+	decenasDIA:     .byte 1
+	unidadesMES:    .byte 1
+	decenasMES:     .byte 1
+
 
 .cseg
 .org 0x0000
@@ -26,16 +37,16 @@ SETUP:
     OUT     SPL, R16
     LDI     R16, HIGH(RAMEND)
     OUT     SPH, R16
+
+
+//MES inicia en 1
+LDI R16, 1
+STS unidadesMES, R16    // Guardar Unidades de Hora
 		
 // ------------------------------------
 	SBI DDRB, DDB5    // led para probar
     CBI PORTB, PORTB5
 
-	WDT_disable:
-    LDI R16, (1<<WDCE) | (1<<WDE)
-    STS WDTCSR, R16
-    LDI R16, (0<<WDE)
-    STS WDTCSR, R16
 
 	
 //input botones (pullup)
@@ -116,6 +127,8 @@ SETUP:
 	CLR R24		// Cuenta HORAS
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
 	CLR R26		// Decenas de HORAS
+	CLR R27		// Carry
+
 
     SEI        // Habilitar interrupciones globales
 
@@ -158,6 +171,13 @@ boton_PB3:
 
 
 DISPF:
+	// -----------------------------------TEMPORAL
+	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
+    LDS R22, decenasMIN     // Cargar Decenas de Minuto
+    LDS R24, unidadesHOR    // Cargar Unidades de Hora
+    LDS R26, decenasHOR     // Cargar Decenas de Hora
+	// -----------------------------------TEMPORAL
+
     CPI R21, 4
 	BRLO DISPSEL     // Si R21 < 4, está bien
     CLR R21          // Si R21 >= 4, resetea a 0    
@@ -221,7 +241,7 @@ DISPLAY:
     LDI ZL, LOW(disp7seg << 1)
 
 	// busca los valores para el 7 segmentos
-	lsl R23		//mueve los bits a la iz (multiplica por 2)
+	LSL R23		//mueve los bits a la iz (multiplica por 2)
 	ADD ZL, R23
 	LDI R20, 0
 	ADC ZH, R20
@@ -253,6 +273,11 @@ RET
 
 TIEMPO:
 	
+	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
+    LDS R22, decenasMIN     // Cargar Decenas de Minuto
+    LDS R24, unidadesHOR    // Cargar Unidades de Hora
+    LDS R26, decenasHOR     // Cargar Decenas de Hora
+
 	CPI R17, 59 //segundos
     BRLO TIMER_RET
 	CLR R17
@@ -285,8 +310,64 @@ DECENASdeHORAS:
 	CPI R26, 3
 	BRLO TIMER_RET
 	CLR R26
+	INC R27
 
 TIMER_RET:
+
+	STS unidadesMIN, R18    // Guardar Unidades de Minuto
+    STS decenasMIN, R22     // Guardar Decenas de Minuto
+    STS unidadesHOR, R24    // Guardar Unidades de Hora
+    STS decenasHOR, R26     // Guardar Decenas de Hora
+	LDS R18, unidadesDIA    // Cargar Unidades de DIA
+    LDS R22, decenasDIA     // Cargar Decenas de DIA
+    LDS R24, unidadesMES    // Cargar Unidades de MES
+    LDS R26, decenasMES     // Cargar Decenas de MES
+
+	// Verificar carry (ya paso un dia?)
+	CPI R27, 0
+	BREQ TIMER_RET2	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
+	INC R18           // Si R27 está activo, sumar 1 a R18
+
+	// Verificar condiciones para saltar a 30dias
+	CPI R24, 4        // ¿R24 es 4 (abril)?
+	BREQ TREINTA_DIAS
+	CPI R24, 6        // ¿R24 es 6 (junio)?
+	BREQ TREINTA_DIAS
+	CPI R24, 9        // ¿R24 es 9 (septiembre)?
+	BREQ TREINTA_DIAS
+
+	// Verificar si R26=1 y R24=1 (noviembre)
+	CPI R26, 1        // ¿R26 es 1?
+	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
+	CPI R24, 1        // ¿R24 es 1?
+	BREQ TREINTA_DIAS // Si ambos son 1, saltar a 30dias
+
+	//Verificar condiciones para saltar a 28dias
+	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)
+	VERIFICAR_28:
+	CPI R24, 2        // ¿R24 es 2 (febrero)?
+	BREQ VEINTIOCHO_DIAS
+
+	//Todos los otros meses tienen 31 dias
+	RJMP TREINTA_Y_UN_DIAS
+
+	TREINTA_DIAS:
+	// Aquí va la lógica para meses de 30 días
+	RJMP TIMER_RET2
+
+	VEINTIOCHO_DIAS:
+	// Aquí va la lógica para febrero (28 días)
+	RJMP TIMER_RET2
+
+	TREINTA_Y_UN_DIAS:
+	// Aquí va la lógica para meses de 31 días
+	RJMP TIMER_RET2
+
+	TIMER_RET2:
+	STS unidadesDIA, R18    // Guardar Unidades de Minuto
+    STS decenasDIA, R22     // Guardar Decenas de Minuto
+    STS unidadesMES, R24    // Guardar Unidades de Hora
+    STS decenasMES, R26     // Guardar Decenas de Hora
     RET
 
 
