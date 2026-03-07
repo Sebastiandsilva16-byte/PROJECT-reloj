@@ -19,8 +19,12 @@
 	decenasMES:				.byte 1
 	Botonespressint:		.byte 1
 	Botonespresspasado:     .byte 1
-	botonespressactual:     .byte 1
+	Botonespresspasado2:    .byte 1
+	Modo:					.byte 1
+	TMPactual:				.byte 1
+	TMPalarma:				.byte 1
 
+	
 .cseg
 .org 0x0000
     RJMP SETUP
@@ -92,11 +96,11 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 	LDI R16, (1 << WGM12) | (1 << CS12) | (0 << CS11) | (1 << CS10)
 	STS TCCR1B, R16
 
-	// Cargar OCR1A (para 16 MHz) ( 15625 | 0x3D09) (ya cuenta 1 min aprox hay que revisar mejor)
+	// Cargar OCR1A (para 16 MHz) ( 15625 | 0x3D09 un sec) 1E83 (medio sec)
 	
-	LDI R16, 0x3D
+	LDI R16, 0x1E
 	STS OCR1AH, R16
-	LDI R16, 0x09
+	LDI R16, 0x83
 	STS OCR1AL, R16
 
 
@@ -117,12 +121,29 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 	STS PCMSK0, r16
 
 
+	// INICIALIZAR VARIABLES EN SRAM
+    LDI R16, 0
+
+    LDI R16, 1              // Día y mes empieza en 1
+    STS decenasDIA, R16
+    STS unidadesMES, R16
+    LDI R16, 0
+    STS Botonespressint, R16
+    STS Botonespresspasado, R16
+	STS unidadesMIN, R16
+    STS decenasMIN, R16
+    STS unidadesHOR, R16
+    STS decenasHOR, R16
+	STS decenasMES, R16
+	STS unidadesDIA, R16
+
+
     // Inicializar registros
     CLR R16		//
     CLR R17		// Contador de segundos
     CLR R18		// Cuenta unidades Minutos	 // y de DIAS
-	CLR R19		// in del portb para saber el estado de los botones
-	CLR R20		// in pasado del portb
+	CLR R19		// Estado real de los botones
+	CLR R20		//
     CLR R21		// Seleciona Display
 	CLR R22		// Cuenta Decenas Minutos	 // y de DIAS
 	CLR R23		// Valor a buscar en el .db
@@ -142,37 +163,7 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 MAIN_LOOP:
     CALL TIEMPO
 	CALL DISPF
-	CALL BOTONES
 	RJMP MAIN_LOOP
-
-BOTONES:
-	
-	CP R19, R20	
-	BRNE FINBOTONES
-	IN	R19, PINB
-	
-	SBRS R19, PB0
-	CALL boton_PB0
-	SBRS R19, PB1
-	CALL boton_PB1
-	SBRS R19, PB2
-	CALL boton_PB2
-	SBRS R19, PB3
-	CALL boton_PB3
-
-	FINBOTONES:
-	MOV R20, R19 //guarda el estado pasado de portb
-	RET
-
-boton_PB0:
-	SBI PINB, PINB5 
-	RET
-boton_PB1:
-	RET
-boton_PB2:
-	RET
-boton_PB3:
-	RET
 
 
 DISPF:
@@ -283,7 +274,7 @@ TIEMPO:
     LDS R24, unidadesHOR    // Cargar Unidades de Hora
     LDS R26, decenasHOR     // Cargar Decenas de Hora
 
-	CPI R17, 1 //segundos
+	CPI R17, 118 //segundos (59)
     BRLO TIMER_RET
 	CLR R17
 
@@ -380,11 +371,11 @@ TIMER1_COMPA:
     PUSH R16
     IN R16, SREG
     PUSH R16
-    
+
+
     INC R17                 // Incrementar contador de ciclos
-	IN R19, PINB			// Guarda el estado actual del portb
-	//SBI PINB, PINB5       //deshabilitado temporalmente
- 
+	SBI PINB, PINB5			// titila cada que pasa un seg
+
 	POP R16      
 	OUT SREG, R16 
 	POP R16     
@@ -395,13 +386,66 @@ INTBOTONES:
 	PUSH R16
 	IN R16, SREG
 	PUSH R16	
+	PUSH R17
 	
-	IN	R19, PINB
+	IN	R17, PINB			 // Leer estado de los botones
+	STS	Botonespressint, R17 // Guardar en variable de interrupción
+	//guarda el estado pasado de los botones
+	LDS R16, Botonespressint
+    STS Botonespresspasado, R16
+	
+	LDI R16, 104     // 10ms 
+DELAY_10MS_LOOP1:
+    LDI R17, 255     // Loop interno
+DELAY_10MS_LOOP2:
+    DEC R17
+    BRNE DELAY_10MS_LOOP2
+    DEC R16
+    BRNE DELAY_10MS_LOOP1
+	
+	IN	R17, PINB			 // Leer estado de los botones
+	STS	Botonespressint, R17 // Guardar en variable de interrupción
+	LDS R16, Botonespressint
+    STS Botonespresspasado2, R16
 
+	// Comparar con el valor pasado	
+	LDS R16, Botonespresspasado
+	LDS R17, Botonespresspasado2
+
+    CP R16, R17            // Comparara el estado pasado con el presente
+    BRNE FINBOTONES            // Si son diferentes, salir
+	
+	MOV R19, R16   // se guardan los verdaderos valores del boton
+	
+	SBRS R19, PB0
+	CALL boton_PB0
+	SBRS R19, PB1
+	CALL boton_PB1
+	SBRS R19, PB2
+	CALL boton_PB2
+	SBRS R19, PB3
+	CALL boton_PB3
+
+	FINBOTONES:
+
+	POP R17
 	POP R16
 	OUT SREG, R16
 	POP R16
 	RETI
+
+boton_PB0:
+	SBI PINB, PINB5 
+	RET
+boton_PB1:
+	SBI PINB, PINB5 
+	RET
+boton_PB2:
+	SBI PINB, PINB5 
+	RET
+boton_PB3:
+	SBI PINB, PINB5 
+	RET
 
 
 
