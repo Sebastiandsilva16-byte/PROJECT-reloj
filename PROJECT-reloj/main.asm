@@ -9,15 +9,17 @@
 .org  SRAM_START
 .dseg
 	.org 0x0100           
-	unidadesMIN:    .byte 1
-	decenasMIN:     .byte 1
-	unidadesHOR:    .byte 1
-	decenasHOR:     .byte 1
-	unidadesDIA:    .byte 1
-	decenasDIA:     .byte 1
-	unidadesMES:    .byte 1
-	decenasMES:     .byte 1
-
+	unidadesMIN:			.byte 1
+	decenasMIN:				.byte 1
+	unidadesHOR:			.byte 1
+	decenasHOR:				.byte 1
+	unidadesDIA:			.byte 1
+	decenasDIA:				.byte 1
+	unidadesMES:			.byte 1
+	decenasMES:				.byte 1
+	Botonespressint:		.byte 1
+	Botonespresspasado:     .byte 1
+	botonespressactual:     .byte 1
 
 .cseg
 .org 0x0000
@@ -281,7 +283,7 @@ TIEMPO:
     LDS R24, unidadesHOR    // Cargar Unidades de Hora
     LDS R26, decenasHOR     // Cargar Decenas de Hora
 
-	CPI R17, 59 //segundos
+	CPI R17, 1 //segundos
     BRLO TIMER_RET
 	CLR R17
 
@@ -351,9 +353,7 @@ TIMER_RET:
 	VERIFICAR_28:
 	CPI R24, 2        // ¿R24 es 2 (febrero)?
 	BREQ VEINTIOCHO_DIAS
-
-	//Todos los otros meses tienen 31 dias
-	RJMP TREINTA_Y_UN_DIAS
+	RJMP TREINTA_Y_UN_DIAS 	//Todos los otros meses tienen 31 dias
 
 	TREINTA_DIAS:
 	// Aquí va la lógica para meses de 30 días
@@ -410,9 +410,9 @@ disp7seg:
     .db 0b00111111 // 0
     .db 0b00000110 // 1
     .db 0b01011011 // 2
-    .db 0b01001111 // 3
+    .db 0b01010111 // 3
     .db 0b01100110 // 4
-    .db 0b01101101 // 5
+    .db 0b01110101 // 5
     .db 0b01111101 // 6
     .db 0b00000111 // 7
     .db 0b01111111 // 8

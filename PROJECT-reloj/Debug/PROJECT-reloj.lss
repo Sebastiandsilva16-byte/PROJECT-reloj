@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Fri Feb 27 14:59:55 2026
+AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Fri Mar 06 16:52:56 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1312,7 +1312,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 0000ee 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
 0000f0 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
                                  
-0000f2 331b                      	CPI R17, 59 //segundos
+0000f2 3011                      	CPI R17, 1 //segundos
 0000f3 f0c0                          BRLO TIMER_RET
 0000f4 2711                      	CLR R17
                                  
@@ -1382,9 +1382,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  	VERIFICAR_28:
 00012a 3082                      	CPI R24, 2        // ¿R24 es 2 (febrero)?
 00012b f011                      	BREQ VEINTIOCHO_DIAS
-                                 
-                                 	//Todos los otros meses tienen 31 dias
-00012c c002                      	RJMP TREINTA_Y_UN_DIAS
+00012c c002                      	RJMP TREINTA_Y_UN_DIAS 	//Todos los otros meses tienen 31 dias
                                  
                                  	TREINTA_DIAS:
                                  	// Aquí va la lógica para meses de 30 días
@@ -1438,37 +1436,37 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  
                                  // Tabla para display de 7 segmentos (referencia)
                                  disp7seg:
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(410): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(408): warning: .cseg .db misalignment - padding zero byte
 00014a 003f                          .db 0b00111111 // 0
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(411): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(409): warning: .cseg .db misalignment - padding zero byte
 00014b 0006                          .db 0b00000110 // 1
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(412): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(410): warning: .cseg .db misalignment - padding zero byte
 00014c 005b                          .db 0b01011011 // 2
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(413): warning: .cseg .db misalignment - padding zero byte
-00014d 004f                          .db 0b01001111 // 3
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(414): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(411): warning: .cseg .db misalignment - padding zero byte
+00014d 0057                          .db 0b01010111 // 3
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(412): warning: .cseg .db misalignment - padding zero byte
 00014e 0066                          .db 0b01100110 // 4
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(415): warning: .cseg .db misalignment - padding zero byte
-00014f 006d                          .db 0b01101101 // 5
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(416): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(413): warning: .cseg .db misalignment - padding zero byte
+00014f 0075                          .db 0b01110101 // 5
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(414): warning: .cseg .db misalignment - padding zero byte
 000150 007d                          .db 0b01111101 // 6
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(417): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(415): warning: .cseg .db misalignment - padding zero byte
 000151 0007                          .db 0b00000111 // 7
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(418): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(416): warning: .cseg .db misalignment - padding zero byte
 000152 007f                          .db 0b01111111 // 8
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(419): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(417): warning: .cseg .db misalignment - padding zero byte
 000153 0067                          .db 0b01100111 // 9
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(420): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(418): warning: .cseg .db misalignment - padding zero byte
 000154 0077                          .db 0b01110111 // A
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(421): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(419): warning: .cseg .db misalignment - padding zero byte
 000155 007c                          .db 0b01111100 // b
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(422): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(420): warning: .cseg .db misalignment - padding zero byte
 000156 0039                          .db 0b00111001 // C
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(423): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(421): warning: .cseg .db misalignment - padding zero byte
 000157 005e                          .db 0b01011110 // d
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(424): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(422): warning: .cseg .db misalignment - padding zero byte
 000158 0079                          .db 0b01111001 // E
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(425): warning: .cseg .db misalignment - padding zero byte
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(423): warning: .cseg .db misalignment - padding zero byte
 
 
 RESOURCE USE INFORMATION
