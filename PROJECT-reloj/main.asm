@@ -120,7 +120,7 @@ SETUP:
     LDI R16, 0
 
     LDI R16, 1              // Día y mes empieza en 1
-    STS decenasDIA, R16
+    STS unidadesDIA, R16
     STS unidadesMES, R16
     LDI R16, 0
     STS Botonespressint, R16
@@ -130,7 +130,7 @@ SETUP:
     STS unidadesHOR, R16
     STS decenasHOR, R16
 	STS decenasMES, R16
-	STS unidadesDIA, R16
+	STS decenasDIA, R16
 
 
     // Inicializar registros
