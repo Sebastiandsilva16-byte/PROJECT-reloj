@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Sun Mar 08 17:15:24 2026
+AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Sun Mar 08 17:21:22 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1124,9 +1124,9 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  
                                  	// Cargar OCR1A (para 16 MHz) 1E83 (medio sec)  (00FF) (pruebas)
                                  	
-00005d e000                      	LDI R16, 0x00
+00005d e10e                      	LDI R16, 0x1E
 00005e 9300 0089                 	STS OCR1AH, R16
-000060 e00f                      	LDI R16, 0x0F
+000060 e803                      	LDI R16, 0x83
 000061 9300 0088                 	STS OCR1AL, R16
                                  
                                  
@@ -1151,7 +1151,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 000071 e000                          LDI R16, 0
                                  
 000072 e001                          LDI R16, 1              // Día y mes empieza en 1
-000073 9300 0105                     STS decenasDIA, R16
+000073 9300 0104                     STS unidadesDIA, R16
 000075 9300 0106                     STS unidadesMES, R16
 000077 e000                          LDI R16, 0
 000078 9300 0108                     STS Botonespressint, R16
@@ -1161,7 +1161,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 000080 9300 0102                     STS unidadesHOR, R16
 000082 9300 0103                     STS decenasHOR, R16
 000084 9300 0107                 	STS decenasMES, R16
-000086 9300 0104                 	STS unidadesDIA, R16
+000086 9300 0105                 	STS decenasDIA, R16
                                  
                                  
                                      // Inicializar registros
@@ -1374,7 +1374,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 00011b 9180 0102                     LDS R24, unidadesHOR    // Cargar Unidades de Hora
 00011d 91a0 0103                     LDS R26, decenasHOR     // Cargar Decenas de Hora
                                  
-00011f 3011                      	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
+00011f 3716                      	CPI R17, 118 //segundos (118) (1 para pruebas de dia y mes)
 000120 f0c0                          BRLO TIMER_RET
 000121 2711                      	CLR R17
                                  

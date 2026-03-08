@@ -93,9 +93,9 @@ SETUP:
 
 	// Cargar OCR1A (para 16 MHz) 1E83 (medio sec)  (00FF) (pruebas)
 	
-	LDI R16, 0x00
+	LDI R16, 0x1E
 	STS OCR1AH, R16
-	LDI R16, 0x0F
+	LDI R16, 0x83
 	STS OCR1AL, R16
 
 
@@ -343,7 +343,7 @@ TIEMPO:
     LDS R24, unidadesHOR    // Cargar Unidades de Hora
     LDS R26, decenasHOR     // Cargar Decenas de Hora
 
-	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
+	CPI R17, 118 //segundos (118) (1 para pruebas de dia y mes)
     BRLO TIMER_RET
 	CLR R17
 
