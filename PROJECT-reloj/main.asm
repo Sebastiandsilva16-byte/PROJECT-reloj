@@ -20,7 +20,6 @@
 	Botonespressint:		.byte 1
 	Botonespresspasado:     .byte 1
 	Botonespresspasado2:    .byte 1
-	Modo:					.byte 1
 	TMPactual:				.byte 1
 	TMPalarma:				.byte 1
 
@@ -43,17 +42,8 @@ SETUP:
     OUT     SPL, R16
     LDI     R16, HIGH(RAMEND)
     OUT     SPH, R16
-
-
-//MES inicia en 1
-LDI R16, 1
-STS unidadesMES, R16    // Guardar Unidades de Hora
 		
 // ------------------------------------
-	SBI DDRB, DDB5    // led para probar
-    CBI PORTB, PORTB5
-
-
 	
 //input botones (pullup)
 	CBI DDRB, DDB0
@@ -88,7 +78,12 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
     CBI PORTD, PORTD5 
 	SBI DDRD, DDD6    // PD6 Salida
     CBI PORTD, PORTD6  
-
+	//LEDS ":"
+	SBI DDRB, DDB5    // PB5 salida
+    CBI PORTB, PORTB5
+	// LED MODO
+	SBI DDRD, DDD7    // PD7 salida
+    CBI PORTD, PORTD7
 	// Configuración Timer1 para 1 minuto en modo CTC ----------------------------------------------------------------------------------
 
 
@@ -96,11 +91,11 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 	LDI R16, (1 << WGM12) | (1 << CS12) | (0 << CS11) | (1 << CS10)
 	STS TCCR1B, R16
 
-	// Cargar OCR1A (para 16 MHz) ( 15625 | 0x3D09 un sec) 1E83 (medio sec)
+	// Cargar OCR1A (para 16 MHz) 1E83 (medio sec)  (00FF) (pruebas)
 	
-	LDI R16, 0x1E
+	LDI R16, 0x00
 	STS OCR1AH, R16
-	LDI R16, 0x83
+	LDI R16, 0x0F
 	STS OCR1AL, R16
 
 
@@ -139,11 +134,11 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 
 
     // Inicializar registros
-    CLR R16		//
+    CLR R16		// HORAMIN (0) / (MESDIA(1) 
     CLR R17		// Contador de segundos
     CLR R18		// Cuenta unidades Minutos	 // y de DIAS
 	CLR R19		// Estado real de los botones
-	CLR R20		//
+	CLR R20		// Modo
     CLR R21		// Seleciona Display
 	CLR R22		// Cuenta Decenas Minutos	 // y de DIAS
 	CLR R23		// Valor a buscar en el .db
@@ -151,7 +146,7 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
 	CLR R26		// Decenas de HORAS		     // y MES
 	CLR R27		// Carry
-	CLR R28
+	CLR R28		//
 	CLR R29
 	CLR R30		// Para Z low
 	CLR R31		// Para Z high
@@ -161,18 +156,92 @@ STS unidadesMES, R16    // Guardar Unidades de Hora
 //------------------------------------------------------------------------------------- ACABA CONFIG----------------------------------------------------------------------------------------
 
 MAIN_LOOP:
-    CALL TIEMPO
+	CALL MODO 
 	CALL DISPF
 	RJMP MAIN_LOOP
 
+MODO:
+    CPI R20, 0
+    BREQ MODO0
+    
+    CPI R20, 1
+    BREQ MODO1
+    
+    CPI R20, 2
+    BREQ MODO2
+    
+    CPI R20, 3
+    BREQ MODO3
+    
+    CPI R20, 4
+    BREQ MODO4
+    
+    CPI R20, 5
+    BREQ MODO5
+
+	CLR R20  //(reinicia lacuenat de modos) y sigue al modo0
+
+
+// PORTD7 Apagado  = Hora Min / Encendido = Mes / Dia
+// PORTB5 (puntos) = Parpadeando = tiempo corre / encendido = config
+ 
+MODO0: //HORAS / MINUTOS
+	CLR R16
+	CBI PORTD, PORTD7
+    CALL TIEMPO
+    RJMP FIN_COMPARAR
+
+MODO1: //DIA / MES
+	LDI R16, 1
+	SBI PORTD, PORTD7
+    CALL TIEMPO
+    RJMP FIN_COMPARAR
+
+MODO2: // CONFIG HM
+	CLR R16
+	CBI PORTD, PORTD7
+	SBI PORTB, PORTB5
+    RJMP FIN_COMPARAR
+
+MODO3: // CONGIG MD
+	LDI R16, 1
+	SBI PORTB, PORTB5
+	SBI PORTD, PORTD7
+    RJMP FIN_COMPARAR
+
+MODO4: // CONFIG ALARMA
+    // Código para modo 4
+    RJMP FIN_COMPARAR
+
+MODO5: // APAGAR ALARMA
+    // Código para modo 5
+    RJMP FIN_COMPARAR
+
+FIN_COMPARAR:
+    RET
 
 DISPF:
-	// -----------------------------------TEMPORAL
+
+	CPI R16, 1
+    BREQ MESDIA
+    
+    CPI R16, 0
+    BREQ HORAMIN
+
+MESDIA:
+	LDS R24, unidadesDIA    // Cargar Unidades de DIA
+    LDS R26, decenasDIA     // Cargar Decenas de DIA
+    LDS R18, unidadesMES    // Cargar Unidades de MES
+    LDS R22, decenasMES     // Cargar Decenas de MES
+
+	RJMP DISPSELCALC
+HORAMIN:
 	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
     LDS R22, decenasMIN     // Cargar Decenas de Minuto
     LDS R24, unidadesHOR    // Cargar Unidades de Hora
     LDS R26, decenasHOR     // Cargar Decenas de Hora
-	// -----------------------------------TEMPORAL
+
+DISPSELCALC:
 
     CPI R21, 4
 	BRLO DISPSEL     // Si R21 < 4, está bien
@@ -274,7 +343,7 @@ TIEMPO:
     LDS R24, unidadesHOR    // Cargar Unidades de Hora
     LDS R26, decenasHOR     // Cargar Decenas de Hora
 
-	CPI R17, 118 //segundos (59)
+	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
     BRLO TIMER_RET
 	CLR R17
 
@@ -321,7 +390,7 @@ TIMER_RET:
 
 	// Verificar carry (ya paso un dia?)
 	CPI R27, 0
-	BREQ TIMER_RET2	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
+	BREQ TEMPORAL	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
 	INC R18           // Si R27 está activo, sumar 1 a R18
 	CLR R27
 
@@ -346,23 +415,98 @@ TIMER_RET:
 	BREQ VEINTIOCHO_DIAS
 	RJMP TREINTA_Y_UN_DIAS 	//Todos los otros meses tienen 31 dias
 
-	TREINTA_DIAS:
-	// Aquí va la lógica para meses de 30 días
+TREINTA_DIAS: // Aquí va la lógica para meses de 30 días ----------------------------------------------
+	CPI R22, 3
+	BREQ TREINTA
+	CPI R18, 10          // Comparar R18 (unidades de día) con 10
+	BRLO TEMPORAL      
+	CLR R18              
+	INC R22
+	RJMP TREINTAFIN
+	TREINTA:
+	CPI R18, 1    
+	BRLO TIMER_RET2      
+	CLR R18                    
+	CLR R22              
+	INC R24 
+	RJMP MESLOG
+	TREINTAFIN:              // Incrementar decenas de día en 1
+	CPI R22, 4          // Comparar R18 (decenas de día) con 4
+	BRLO TIMER_RET2      
+	CLR R22              
+	INC R24              // Incrementar unidades de mes
+	RJMP MESLOG //ahora va a ver la logica de los meses
+TEMPORAL:
+	RJMP MESLOG
+VEINTIOCHO_DIAS:	// Aquí va la lógica para febrero (28 días)----------------------------------------------------
+	CPI R22, 2
+	BREQ VEINTE
+	CPI R18, 10          // Comparar R18 (unidades de día) con 10
+	BRLO TIMER_RET2      
+	CLR R18              
+	INC R22              // Incrementar decenas de día en 1
+	RJMP VEINTEFIN
+VEINTE:
+	CPI R18, 9          // Comparar R18 (unidades de día) con 9
+	BRLO TIMER_RET2      
+	CLR R18              
+	INC R22              // Incrementar decenas de día en 1
+VEINTEFIN:
+	CPI R22, 3          // Comparar R18 (decenas de día) con 3
+	BRLO TIMER_RET2      
+	CLR R22              
+	INC R24              // Incrementar unidades de mes
+	RJMP MESLOG //ahora va a ver la logica de los meses
+TREINTA_Y_UN_DIAS: // Aquí va la lógica para meses de 31 días -----------------------------------------------------
+	CPI R22, 3
+	BREQ TREINTAUNO
+	CPI R18, 10          // Comparar R18 (unidades de día) con 10
+	BRLO TIMER_RET2      
+	CLR R18              
+	INC R22              // Incrementar decenas de día en 1
+	RJMP TREINTAUNOFIN
+TREINTAUNO:
+	CPI R18, 2          // Comparar R18 (unidades de día) con 9
+	BRLO TIMER_RET2      
+	CLR R18              
+	CLR R22              
+	INC R24 
+	RJMP MESLOG
+TREINTAUNOFIN:
+	CPI R22, 4          // Comparar R18 (decenas de día) con 3
+	BRLO TIMER_RET2      
+	CLR R22              
+	INC R24              // Incrementar unidades de mes
+	RJMP MESLOG //ahora va a ver la logica de los meses
+	MESLOG:
+	CPI R26, 1
+	BREQ MES10
+	MESNORMAL:
+	CPI R24, 10          // si alcanzan las decenas suma 1
+	BRLO TIMER_RET2      
+	CLR R24            
+	INC R26              // Incrementar decenas de mes
+	LDI R24, 1            
+	CLR R22
+	LDI R18, 1 
+
 	RJMP TIMER_RET2
 
-	VEINTIOCHO_DIAS:
-	// Aquí va la lógica para febrero (28 días)
-	RJMP TIMER_RET2
+	MES10:
 
-	TREINTA_Y_UN_DIAS:
-	// Aquí va la lógica para meses de 31 días
-	RJMP TIMER_RET2
+	CPI R24, 3          // si alcanza 3 reinicia
+	BRLO TIMER_RET2      
+	LDI R24, 1            
+	CLR R26   
+	CLR R22
+	LDI R18, 1          
+
 
 	TIMER_RET2:
-	STS unidadesDIA, R18    // Guardar Unidades de Minuto
-    STS decenasDIA, R22     // Guardar Decenas de Minuto
-    STS unidadesMES, R24    // Guardar Unidades de Hora
-    STS decenasMES, R26     // Guardar Decenas de Hora
+	STS unidadesDIA, R18    // Guardar Unidades de DIA
+    STS decenasDIA, R22     // Guardar Decenas de DIA
+    STS unidadesMES, R24    // Guardar Unidades de MES
+    STS decenasMES, R26     // Guardar Decenas de MES
     RET
 
 
@@ -435,8 +579,11 @@ DELAY_10MS_LOOP2:
 	RETI
 
 boton_PB0:
-	SBI PINB, PINB5 
+	
+	INC R20       //Cambia de modo
+    
 	RET
+
 boton_PB1:
 	SBI PINB, PINB5 
 	RET
