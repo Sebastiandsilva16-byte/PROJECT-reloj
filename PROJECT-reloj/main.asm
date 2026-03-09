@@ -20,6 +20,9 @@
 	Botonespressint:		.byte 1
 	Botonespresspasado:     .byte 1
 	Botonespresspasado2:    .byte 1
+	Selectordisp:			.byte 1
+	Configmas:				.byte 1
+	Configmen:				.byte 1
 	TMPactual:				.byte 1
 	TMPalarma:				.byte 1
 
@@ -146,7 +149,7 @@ SETUP:
 	CLR R25		// Agarra los valores de R23 Para Actualizar el display
 	CLR R26		// Decenas de HORAS		     // y MES
 	CLR R27		// Carry
-	CLR R28		//
+	CLR R28		// VARX (solo la llamo para comparaciones no guarda nada)
 	CLR R29
 	CLR R30		// Para Z low
 	CLR R31		// Para Z high
@@ -160,66 +163,158 @@ MAIN_LOOP:
 	CALL DISPF
 	RJMP MAIN_LOOP
 
-MODO:
-    CPI R20, 0
+MODO:   //-------------------------------------------------------------------------------------------MODO SEL
+    CPI R20, 0  // horas y minutos
     BREQ MODO0
     
-    CPI R20, 1
+    CPI R20, 1 // dias y meses
     BREQ MODO1
     
-    CPI R20, 2
+    CPI R20, 2  // config de 0
     BREQ MODO2
     
-    CPI R20, 3
+    CPI R20, 3 // config de 2
     BREQ MODO3
     
-    CPI R20, 4
+    CPI R20, 4 // config alarma
     BREQ MODO4
     
-    CPI R20, 5
+    CPI R20, 5 // set/reset alarma
     BREQ MODO5
 
-	CLR R20  //(reinicia lacuenat de modos) y sigue al modo0
+	CLR R20  //(reinicia la cuenta de modos) y sigue al modo0
 
 
 // PORTD7 Apagado  = Hora Min / Encendido = Mes / Dia
 // PORTB5 (puntos) = Parpadeando = tiempo corre / encendido = config
- 
+
+// --------------------------------------------------------------------------------------------MODOS 
 MODO0: //HORAS / MINUTOS
+// llama la funcion que cuenta el tiempo
+// y asigna r16 para que se muestre HH : MM
+// des activa el led naranja para indicar HH:MM
 	CLR R16
 	CBI PORTD, PORTD7
     CALL TIEMPO
     RJMP FIN_COMPARAR
 
 MODO1: //DIA / MES
+// asigna r16 para que se muestre DD : MES
+// activa el led naranja para indicar DD:MES
 	LDI R16, 1
 	SBI PORTD, PORTD7
     CALL TIEMPO
     RJMP FIN_COMPARAR
 
 MODO2: // CONFIG HM
+//	asigna r16 para que se muestre HH : MM
+// des activa el led naranja para indicar HH:MM
+// Enciende los : para indicar modo config
 	CLR R16
 	CBI PORTD, PORTD7
 	SBI PORTB, PORTB5
     RJMP FIN_COMPARAR
+	CALL CONFIGRELOJ
 
 MODO3: // CONGIG MD
+// asigna r16 para que se muestre DD : MES
+// activa el led naranja para indicar DD:MES
+// Enciende los : para indicar modo config
 	LDI R16, 1
 	SBI PORTB, PORTB5
 	SBI PORTD, PORTD7
+	CALL CONFIGRELOJ
     RJMP FIN_COMPARAR
 
 MODO4: // CONFIG ALARMA
-    // Código para modo 4
+//	asigna r16 para que se muestre HH : MM
+	CLR R16
     RJMP FIN_COMPARAR
 
 MODO5: // APAGAR ALARMA
-    // Código para modo 5
+ //	asigna r16 para que se muestre HH : MM
+	CLR R16
     RJMP FIN_COMPARAR
 
 FIN_COMPARAR:
     RET
 
+//--------------------------------------------------------------------------LOAD y SAVE 
+// para reducir espacio en el codigo
+LOADHM:
+	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
+    LDS R22, decenasMIN     // Cargar Decenas de Minuto
+    LDS R24, unidadesHOR    // Cargar Unidades de Hora
+    LDS R26, decenasHOR     // Cargar Decenas de Hora
+	RET
+LOADDM:
+	LDS R24, unidadesDIA    // Cargar Unidades de DIA
+    LDS R26, decenasDIA     // Cargar Decenas de DIA
+    LDS R18, unidadesMES    // Cargar Unidades de MES
+    LDS R22, decenasMES     // Cargar Decenas de MES
+	RET
+SAVEHM:
+	STS unidadesMIN, R18    // Guardar Unidades de Minuto
+    STS decenasMIN, R22     // Guardar Decenas de Minuto
+    STS unidadesHOR, R24    // Guardar Unidades de Hora
+    STS decenasHOR, R26     // Guardar Decenas de Hora
+	RET
+SAVEDM:
+	STS unidadesDIA, R18    // Guardar Unidades de DIA
+    STS decenasDIA, R22     // Guardar Decenas de DIA
+    STS unidadesMES, R24    // Guardar Unidades de MES
+    STS decenasMES, R26     // Guardar Decenas de MES
+	RET
+
+//--------------------------------------------------------------------------------------CONFIGRELOJ
+//Toda la logia para la suma y resta manual del reloj
+
+CONFIGRELOJ:
+//R16 (0) MM:HH (1) DD:MM 
+
+	CPI R16, 1
+    BREQ CONFIGMESDIA
+    
+    CPI R16, 0
+    BREQ CONFIGHORAMIN
+//Configmen (0) nada (1) restar 
+//Configmas (0) nada (1) sumar	
+
+CONFIGMESDIA:
+	CALL LOADMD	
+	//mira si hay que sumar
+	LDS R28, Configmas  
+	CPI R28, 1
+	BREQ SUMARDM
+	//mira si hay que restar
+	LDS R28, Configmen
+	CPI R28, 1
+	BREQ RESTADM
+	
+
+	CALL SAVEMD
+	RJMP CONFIGRELOJFIN
+
+CONFIGHORAMIN:
+	CALL LOADHM	
+
+	//mira si hay que sumar
+	LDS R28, Configmas  
+	CPI R28, 1
+	BREQ SUMARHM
+	//mira si hay que restar
+	LDS R28, Configmen
+	CPI R28, 1
+	BREQ RESTAHM
+
+	CALL SAVEHM
+CONFIGRELOJFIN:
+
+	RET
+
+
+//----------------------------------------------------------------------------------------------DISPF
+// toda la logica para el funcionamiento de los displays
 DISPF:
 
 	CPI R16, 1
@@ -229,17 +324,10 @@ DISPF:
     BREQ HORAMIN
 
 MESDIA:
-	LDS R24, unidadesDIA    // Cargar Unidades de DIA
-    LDS R26, decenasDIA     // Cargar Decenas de DIA
-    LDS R18, unidadesMES    // Cargar Unidades de MES
-    LDS R22, decenasMES     // Cargar Decenas de MES
-
+	CALL LOADDM
 	RJMP DISPSELCALC
 HORAMIN:
-	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
-    LDS R22, decenasMIN     // Cargar Decenas de Minuto
-    LDS R24, unidadesHOR    // Cargar Unidades de Hora
-    LDS R26, decenasHOR     // Cargar Decenas de Hora
+	CALL LOADHM
 
 DISPSELCALC:
 
@@ -336,16 +424,24 @@ DISPLAY:
 RET
 
 
+// -----------------------------------------------------------------------------------------------------TIEMPO
+// Toda la logica de la cuenta del tiempo
 TIEMPO:
 	
-	LDS R18, unidadesMIN    // Cargar Unidades de Minuto
-    LDS R22, decenasMIN     // Cargar Decenas de Minuto
-    LDS R24, unidadesHOR    // Cargar Unidades de Hora
-    LDS R26, decenasHOR     // Cargar Decenas de Hora
+	CALL LOADHM
+	
+	// modos con la cuenta interrumpida
+	CPI R20, 2
+    BRLO Sicontar
+	CLR	R17
+	RJMP Nocontar
+	Sicontar:
 
 	CPI R17, 118 //segundos (118) (1 para pruebas de dia y mes)
     BRLO TIMER_RET
 	CLR R17
+
+	Nocontar:
 
 	//Unidades de Minutos
 	INC R18
@@ -378,15 +474,9 @@ DECENASdeHORAS:
 	INC R27
 
 TIMER_RET:
-	//Ahora cambio para hacer lo de las horas
-	STS unidadesMIN, R18    // Guardar Unidades de Minuto
-    STS decenasMIN, R22     // Guardar Decenas de Minuto
-    STS unidadesHOR, R24    // Guardar Unidades de Hora
-    STS decenasHOR, R26     // Guardar Decenas de Hora
-	LDS R18, unidadesDIA    // Cargar Unidades de DIA
-    LDS R22, decenasDIA     // Cargar Decenas de DIA
-    LDS R24, unidadesMES    // Cargar Unidades de MES
-    LDS R26, decenasMES     // Cargar Decenas de MES
+	//Ahora cambio para hacer lo de los dias
+	CALL SAVEHM
+	CALL LOADDM
 
 	// Verificar carry (ya paso un dia?)
 	CPI R27, 0
@@ -503,14 +593,12 @@ TREINTAUNOFIN:
 
 
 	TIMER_RET2:
-	STS unidadesDIA, R18    // Guardar Unidades de DIA
-    STS decenasDIA, R22     // Guardar Decenas de DIA
-    STS unidadesMES, R24    // Guardar Unidades de MES
-    STS decenasMES, R26     // Guardar Decenas de MES
+	CALL SAVEDM
     RET
-
+//--------------------------------------------------------------------------------------------------------INTERRUPCIONES
 
 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
+// Se encarga de contar los segundos
 TIMER1_COMPA:      
     PUSH R16
     IN R16, SREG
@@ -526,6 +614,7 @@ TIMER1_COMPA:
 	RETI
 
 // Rutina de interrupcion del PORTB
+// La logica de los botones
 INTBOTONES:
 	PUSH R16
 	IN R16, SREG
@@ -578,23 +667,58 @@ DELAY_10MS_LOOP2:
 	POP R16
 	RETI
 
-boton_PB0:
+boton_PB0://----------------------------
 	
 	INC R20       //Cambia de modo
     
 	RET
 
-boton_PB1:
-	SBI PINB, PINB5 
-	RET
-boton_PB2:
-	SBI PINB, PINB5 
-	RET
-boton_PB3:
-	SBI PINB, PINB5 
+boton_PB1: //----------------------------
+	// selecciona el display
+	LDS R16, Selectordisp
+	INC R16
+	CPI R16, 4
+	BRLO SDOVER
+	CLR R16
+SDOVER:
+	STS Selectordisp, R16
 	RET
 
+boton_PB2: //----------------------------
+	
+	CPI R20, 2
+    BREQ ACTIVOPB2
+    
+    CPI R20, 3
+    BREQ ACTIVOPB2
 
+	RJMP boton_PB2fin
+ACTIVOPB2:
+	PUSH R20
+	LDI R20, 1
+	STS Configmas, R20
+	POP R20
+boton_PB2fin:
+
+	RET
+
+boton_PB3: //----------------------------
+	CPI R20, 2
+    BREQ ACTIVOPB3
+    
+    CPI R20, 3
+    BREQ ACTIVOPB3
+
+	RJMP boton_PB3fin
+
+ACTIVOPB3:
+	PUSH R21
+	LDI R21, 1
+	STS Configmen, R21
+	POP R21
+
+boton_PB3fin:
+	RET
 
 // Tabla para display de 7 segmentos (referencia)
 disp7seg:
