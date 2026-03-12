@@ -25,7 +25,7 @@
 	Configmen:				.byte 1
 	TMPactual:				.byte 1
 	TMPalarma:				.byte 1
-
+	loops:					.byte 1
 	
 .cseg
 .org 0x0000
@@ -96,9 +96,9 @@ SETUP:
 
 	// Cargar OCR1A (para 16 MHz) 1E83 (medio sec)  (00FF) (pruebas)
 	
-	LDI R16, 0x1E
+	LDI R16, 0x00
 	STS OCR1AH, R16
-	LDI R16, 0x83
+	LDI R16, 0x01
 	STS OCR1AL, R16
 
 
@@ -150,7 +150,7 @@ SETUP:
 	CLR R26		// Decenas de HORAS		     // y MES
 	CLR R27		// Carry
 	CLR R28		// VARX (solo la llamo para comparaciones no guarda nada)
-	CLR R29
+	CLR R29		// VARX 2
 	CLR R30		// Para Z low
 	CLR R31		// Para Z high
 
@@ -248,6 +248,13 @@ LOADHM:
     LDS R26, decenasHOR     // Cargar Decenas de Hora
 	RET
 LOADDM:
+	LDS R18, unidadesDIA    // Cargar Unidades de DIA
+    LDS R22, decenasDIA     // Cargar Decenas de DIA
+    LDS R24, unidadesMES    // Cargar Unidades de MES
+    LDS R26, decenasMES     // Cargar Decenas de MES
+	RET
+//invertido para el display	
+LOADDMINV:
 	LDS R24, unidadesDIA    // Cargar Unidades de DIA
     LDS R26, decenasDIA     // Cargar Decenas de DIA
     LDS R18, unidadesMES    // Cargar Unidades de MES
@@ -281,7 +288,7 @@ CONFIGRELOJ:
 //Configmas (0) nada (1) sumar	
 
 CONFIGMESDIA:
-	CALL LOADMD	
+	CALL LOADDM	
 	//mira si hay que sumar
 	LDS R28, Configmas  
 	CPI R28, 1
@@ -290,11 +297,50 @@ CONFIGMESDIA:
 	LDS R28, Configmen
 	CPI R28, 1
 	BREQ RESTADM
-	
-
-	CALL SAVEMD
+	//si no pasa nada regresa
 	RJMP CONFIGRELOJFIN
 
+SUMARDM:  //los modos de suma se pueden aprovechar de la funcion Tiempo asi que solo hago una suma y hago una calls
+	LDS R28, Selectordisp
+
+	CPI R28, 0 // Compara con 0
+    BREQ SuniDmes
+    CPI R28, 1 // Compara con 1
+    BREQ SdecDmes
+    CPI R28, 2 // Compara con 2
+    BREQ SuniDdia 
+    CPI R28, 3 // Compara con 3
+    BREQ SdecDdia
+
+SuniDmes:
+	RJMP RESTADM
+SdecDmes:
+	RJMP RESTADM
+SuniDdia:
+	RJMP RESTADM
+SdecDdia:
+
+RESTADM:
+	LDS R28, Selectordisp
+
+	CPI R28, 0 // Compara con 0
+    BREQ RuniDmes
+    CPI R28, 1 // Compara con 1
+    BREQ RdecDmes
+    CPI R28, 2 // Compara con 2
+    BREQ RuniDdia
+    CPI R28, 3 // Compara con 3
+    BREQ RdecDdia
+
+RuniDmes:
+RdecDmes:
+RuniDdia:
+RdecDdia:
+	
+
+
+	CALL SAVEDM
+	RJMP CONFIGRELOJFIN
 CONFIGHORAMIN:
 	CALL LOADHM	
 
@@ -306,8 +352,45 @@ CONFIGHORAMIN:
 	LDS R28, Configmen
 	CPI R28, 1
 	BREQ RESTAHM
+	//si no pasa nada regresa
+	RJMP CONFIGRELOJFIN
+
+SUMARHM:
+	LDS R28, Selectordisp
+
+	CPI R28, 0 // Compara con 0
+    BREQ SuniDmin
+    CPI R28, 1 // Compara con 1
+    BREQ SdecDmin
+    CPI R28, 2 // Compara con 2
+    BREQ SuniDhora
+    CPI R28, 3 // Compara con 3
+    BREQ SdecDhora
+
+SuniDmin:
+SdecDmin:
+SuniDhora:
+SdecDhora:
+
+RESTAHM:
+	LDS R28, Selectordisp
+	
+	CPI R28, 0 // Compara con 0
+    BREQ RuniDmin
+    CPI R28, 1 // Compara con 1
+    BREQ RdecDmin
+    CPI R28, 2 // Compara con 2
+    BREQ RuniDhora
+    CPI R28, 3 // Compara con 3
+    BREQ RdecDhora
+
+RuniDmin:
+RdecDmin:
+RuniDhora:
+RdecDhora:
 
 	CALL SAVEHM
+	RJMP CONFIGRELOJFIN
 CONFIGRELOJFIN:
 
 	RET
@@ -324,7 +407,7 @@ DISPF:
     BREQ HORAMIN
 
 MESDIA:
-	CALL LOADDM
+	CALL LOADDMINV
 	RJMP DISPSELCALC
 HORAMIN:
 	CALL LOADHM
@@ -437,7 +520,7 @@ TIEMPO:
 	RJMP Nocontar
 	Sicontar:
 
-	CPI R17, 118 //segundos (118) (1 para pruebas de dia y mes)
+	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
     BRLO TIMER_RET
 	CLR R17
 
@@ -483,7 +566,6 @@ TIMER_RET:
 	BREQ TEMPORAL	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
 	INC R18           // Si R27 está activo, sumar 1 a R18
 	CLR R27
-
 	// Verificar condiciones para saltar a 30dias
 	CPI R24, 4        // ¿R24 es 4 (abril)?
 	BREQ TREINTA_DIAS
