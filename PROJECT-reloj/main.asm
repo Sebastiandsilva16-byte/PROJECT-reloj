@@ -26,6 +26,7 @@
 	TMPactual:				.byte 1
 	TMPalarma:				.byte 1
 	Mes:					.byte 1
+	Mess:					.byte 1
 	
 .cseg
 .org 0x0000
@@ -570,7 +571,7 @@ TIMER_RET:
 	CALL LOGDIAS			//para ver como se debe efectuar la suma de dias
 
 	LDS R28, Mes
-	CPI R28, 0  // horas y minutos
+	CPI R28, 0  
     BREQ TREINTA_Y_UN_DIAS
     
     CPI R28, 1
@@ -590,7 +591,7 @@ TREINTA_DIAS: // Aquí va la lógica para meses de 30 días -----------------------
 	RJMP TREINTAFIN
 	TREINTA:
 	CPI R18, 1    
-	BRLO TIMER_RET2      
+	BRLO TEMPORAL     
 	CLR R18                    
 	CLR R22              
 	INC R24 
@@ -641,33 +642,34 @@ TREINTAUNOFIN:
 	CPI R22, 4          // Comparar R18 (decenas de día) con 3
 	BRLO TIMER_RET2      
 	CLR R22              
-	INC R24              // Incrementar unidades de mes
-	RJMP MESLOG //ahora va a ver la logica de los meses
-	MESLOG:
-	CPI R26, 1
-	BREQ MES10
+	INC R24              // Incrementar unidades de mes 
+MESLOG: //ahora va a ver la logica de los meses
+	CALL MESLOG2
+	   
+	LDS R28, Mess
+	CPI R28, 0  
+    BREQ MESNORMAL
+    
+    CPI R28, 1
+    BREQ MES10
+		
 	MESNORMAL:
 	CPI R24, 10          // si alcanzan las decenas suma 1
 	BRLO TIMER_RET2      
 	CLR R24            
-	INC R26              // Incrementar decenas de mes
-	LDI R24, 1            
+	INC R26              // Incrementar decenas de mes      
 	CLR R22
 	LDI R18, 1 
-
 	RJMP TIMER_RET2
 
 	MES10:
-
 	CPI R24, 3          // si alcanza 3 reinicia
 	BRLO TIMER_RET2      
 	LDI R24, 1            
 	CLR R26   
 	CLR R22
-	LDI R18, 1          
-
-
-	TIMER_RET2:
+	LDI R18, 1    	 
+TIMER_RET2:
 	CALL SAVEDM
     RET
 
@@ -710,8 +712,21 @@ LOGDIAS:
 		STS	Mes, R28
 	LOGMESFIN:
 		RET
+//---------------------------------------------------------------otra variable  para la logica de los meses
+// Mess (0) 0-9 (1) 10-12
+MESLOG2:
+	CPI R26, 1
+	BRLO MESS0
+MESS1:
+	LDI R28, 1
+	STS	Mess, R28
+	RJMP MESSLOG2FIN
+MESS0:
+	CLR R28
+	STS	Mess, R28
 
-
+MESSLOG2FIN: 
+	RET
 //--------------------------------------------------------------------------------------------------------INTERRUPCIONES
 
 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
