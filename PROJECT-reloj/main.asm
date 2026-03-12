@@ -25,7 +25,7 @@
 	Configmen:				.byte 1
 	TMPactual:				.byte 1
 	TMPalarma:				.byte 1
-	loops:					.byte 1
+	Mes:					.byte 1
 	
 .cseg
 .org 0x0000
@@ -566,26 +566,19 @@ TIMER_RET:
 	BREQ TEMPORAL	  // Si R27 es 0, (no cambio nada en MES/DIA asi que sale)
 	INC R18           // Si R27 está activo, sumar 1 a R18
 	CLR R27
-	// Verificar condiciones para saltar a 30dias
-	CPI R24, 4        // ¿R24 es 4 (abril)?
-	BREQ TREINTA_DIAS
-	CPI R24, 6        // ¿R24 es 6 (junio)?
-	BREQ TREINTA_DIAS
-	CPI R24, 9        // ¿R24 es 9 (septiembre)?
-	BREQ TREINTA_DIAS
 
-	// Verificar si R26=1 y R24=1 (noviembre)
-	CPI R26, 1        // ¿R26 es 1?
-	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
-	CPI R24, 1        // ¿R24 es 1?
-	BREQ TREINTA_DIAS // Si ambos son 1, saltar a 30dias
+	CALL LOGDIAS			//para ver como se debe efectuar la suma de dias
 
-	//Verificar condiciones para saltar a 28dias
-	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)
-	VERIFICAR_28:
-	CPI R24, 2        // ¿R24 es 2 (febrero)?
-	BREQ VEINTIOCHO_DIAS
-	RJMP TREINTA_Y_UN_DIAS 	//Todos los otros meses tienen 31 dias
+	LDS R28, Mes
+	CPI R28, 0  // horas y minutos
+    BREQ TREINTA_Y_UN_DIAS
+    
+    CPI R28, 1
+    BREQ TREINTA_DIAS
+    
+    CPI R28, 2  
+    BREQ VEINTIOCHO_DIAS
+
 
 TREINTA_DIAS: // Aquí va la lógica para meses de 30 días ----------------------------------------------
 	CPI R22, 3
@@ -677,6 +670,46 @@ TREINTAUNOFIN:
 	TIMER_RET2:
 	CALL SAVEDM
     RET
+
+//--------------------------------------------------------------------------------------------------------LOGICA DE DIAS
+// Mes-->  (0) 31 dias (1) 30 dias (2) 28 dias
+LOGDIAS:
+	// Verificar condiciones para saltar a 30dias
+	CPI R24, 4        // ¿R24 es 4 (abril)?
+	BREQ MESUNO
+	CPI R24, 6        // ¿R24 es 6 (junio)?
+	BREQ MESUNO
+	CPI R24, 9        // ¿R24 es 9 (septiembre)?
+	BREQ MESUNO
+
+	// Verificar si R26=1 y R24=1 (noviembre)
+	CPI R26, 1        // ¿R26 es 1?
+	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
+	CPI R24, 1        // ¿R24 es 1?
+	BREQ MESUNO // Si ambos son 1, saltar a 30dias
+
+	//Verificar condiciones para saltar a 28dias
+	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)
+	VERIFICAR_28:
+	CPI R24, 2        // ¿R24 es 2 (febrero)?
+	BREQ MESDOS
+
+
+	MESZERO:
+		CLR R28
+		STS	Mes, R28
+		RJMP LOGMESFIN
+	MESUNO:
+		LDI R28, 1
+		STS	Mes, R28
+		RJMP LOGMESFIN
+	MESDOS:
+		LDI R28, 2
+		STS	Mes, R28
+	LOGMESFIN:
+		RET
+
+
 //--------------------------------------------------------------------------------------------------------INTERRUPCIONES
 
 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
