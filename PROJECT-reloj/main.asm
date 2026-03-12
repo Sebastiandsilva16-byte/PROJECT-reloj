@@ -520,7 +520,7 @@ TIEMPO:
 	RJMP Nocontar
 	Sicontar:
 
-	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
+	CPI R17, 2 //segundos (118) (1 para pruebas de dia y mes)
     BRLO TIMER_RET
 	CLR R17
 
@@ -687,6 +687,8 @@ LOGDIAS:
 	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
 	CPI R24, 1        // ¿R24 es 1?
 	BREQ MESUNO // Si ambos son 1, saltar a 30dias
+	CPI R24, 2       // ¿R24 es 1?
+	BREQ MESZERO
 
 	//Verificar condiciones para saltar a 28dias
 	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)

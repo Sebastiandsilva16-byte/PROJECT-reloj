@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Thu Mar 12 15:36:03 2026
+AVRASM ver. 2.2.8  C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm Thu Mar 12 15:41:00 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1062,9 +1062,9 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  .org 0x0000
 000000 c033                          RJMP SETUP
                                  .org 0x0008
-000008 c21c                      	RJMP INTBOTONES //interrpciones de botones portB
+000008 c21e                      	RJMP INTBOTONES //interrpciones de botones portB
                                  .org 0x0016         
-000016 c205                          RJMP TIMER1_COMPA	// Vector de interrupción para TIMER1_COMPA 
+000016 c207                          RJMP TIMER1_COMPA	// Vector de interrupción para TIMER1_COMPA 
                                  
                                  
                                  
@@ -1505,7 +1505,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 000172 93ef                          PUSH ZL
                                  
 000173 e0f4                          LDI ZH, HIGH(disp7seg << 1)
-000174 eeec                          LDI ZL, LOW(disp7seg << 1)
+000174 efe0                          LDI ZL, LOW(disp7seg << 1)
                                  
                                  	// busca los valores para el 7 segmentos
 000175 0f77                      	LSL R23		//mueve los bits a la iz (multiplica por 2)
@@ -1551,7 +1551,7 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
 00018f c003                      	RJMP Nocontar
                                  	Sicontar:
                                  
-000190 3011                      	CPI R17, 1 //segundos (118) (1 para pruebas de dia y mes)
+000190 3012                      	CPI R17, 2 //segundos (118) (1 para pruebas de dia y mes)
 000191 f0c0                          BRLO TIMER_RET
 000192 2711                      	CLR R17
                                  
@@ -1707,38 +1707,40 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  LOGDIAS:
                                  	// Verificar condiciones para saltar a 30dias
 000204 3084                      	CPI R24, 4        // ¿R24 es 4 (abril)?
-000205 f071                      	BREQ MESUNO
+000205 f081                      	BREQ MESUNO
 000206 3086                      	CPI R24, 6        // ¿R24 es 6 (junio)?
-000207 f061                      	BREQ MESUNO
+000207 f071                      	BREQ MESUNO
 000208 3089                      	CPI R24, 9        // ¿R24 es 9 (septiembre)?
-000209 f051                      	BREQ MESUNO
+000209 f061                      	BREQ MESUNO
                                  
                                  	// Verificar si R26=1 y R24=1 (noviembre)
 00020a 30a1                      	CPI R26, 1        // ¿R26 es 1?
-00020b f411                      	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
+00020b f421                      	BRNE VERIFICAR_28 // Si R26 no es 1, seguir a la siguiente verificación
 00020c 3081                      	CPI R24, 1        // ¿R24 es 1?
-00020d f031                      	BREQ MESUNO // Si ambos son 1, saltar a 30dias
+00020d f041                      	BREQ MESUNO // Si ambos son 1, saltar a 30dias
+00020e 3082                      	CPI R24, 2       // ¿R24 es 1?
+00020f f011                      	BREQ MESZERO
                                  
                                  	//Verificar condiciones para saltar a 28dias
                                  	// (Como el reloj no cuenta años no voy a tomaren cuenta los años con 29 dias)
                                  	VERIFICAR_28:
-00020e 3082                      	CPI R24, 2        // ¿R24 es 2 (febrero)?
-00020f f041                      	BREQ MESDOS
+000210 3082                      	CPI R24, 2        // ¿R24 es 2 (febrero)?
+000211 f041                      	BREQ MESDOS
                                  
                                  
                                  	MESZERO:
-000210 27cc                      		CLR R28
-000211 93c0 0110                 		STS	Mes, R28
-000213 c007                      		RJMP LOGMESFIN
+000212 27cc                      		CLR R28
+000213 93c0 0110                 		STS	Mes, R28
+000215 c007                      		RJMP LOGMESFIN
                                  	MESUNO:
-000214 e0c1                      		LDI R28, 1
-000215 93c0 0110                 		STS	Mes, R28
-000217 c003                      		RJMP LOGMESFIN
+000216 e0c1                      		LDI R28, 1
+000217 93c0 0110                 		STS	Mes, R28
+000219 c003                      		RJMP LOGMESFIN
                                  	MESDOS:
-000218 e0c2                      		LDI R28, 2
-000219 93c0 0110                 		STS	Mes, R28
+00021a e0c2                      		LDI R28, 2
+00021b 93c0 0110                 		STS	Mes, R28
                                  	LOGMESFIN:
-00021b 9508                      		RET
+00021d 9508                      		RET
                                  
                                  
                                  //--------------------------------------------------------------------------------------------------------INTERRUPCIONES
@@ -1746,159 +1748,159 @@ C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(6
                                  // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
                                  // Se encarga de contar los segundos
                                  TIMER1_COMPA:      
-00021c 930f                          PUSH R16
-00021d b70f                          IN R16, SREG
 00021e 930f                          PUSH R16
+00021f b70f                          IN R16, SREG
+000220 930f                          PUSH R16
                                  
                                  
-00021f 9513                          INC R17                 // Incrementar contador de ciclos
-000220 9a1d                      	SBI PINB, PINB5			// titila cada que pasa un seg
+000221 9513                          INC R17                 // Incrementar contador de ciclos
+000222 9a1d                      	SBI PINB, PINB5			// titila cada que pasa un seg
                                  
-000221 910f                      	POP R16      
-000222 bf0f                      	OUT SREG, R16 
-000223 910f                      	POP R16     
-000224 9518                      	RETI
+000223 910f                      	POP R16      
+000224 bf0f                      	OUT SREG, R16 
+000225 910f                      	POP R16     
+000226 9518                      	RETI
                                  
                                  // Rutina de interrupcion del PORTB
                                  // La logica de los botones
                                  INTBOTONES:
-000225 930f                      	PUSH R16
-000226 b70f                      	IN R16, SREG
-000227 930f                      	PUSH R16	
-000228 931f                      	PUSH R17
+000227 930f                      	PUSH R16
+000228 b70f                      	IN R16, SREG
+000229 930f                      	PUSH R16	
+00022a 931f                      	PUSH R17
                                  	
-000229 b113                      	IN	R17, PINB			 // Leer estado de los botones
-00022a 9310 0108                 	STS	Botonespressint, R17 // Guardar en variable de interrupción
+00022b b113                      	IN	R17, PINB			 // Leer estado de los botones
+00022c 9310 0108                 	STS	Botonespressint, R17 // Guardar en variable de interrupción
                                  	//guarda el estado pasado de los botones
-00022c 9100 0108                 	LDS R16, Botonespressint
-00022e 9300 0109                     STS Botonespresspasado, R16
+00022e 9100 0108                 	LDS R16, Botonespressint
+000230 9300 0109                     STS Botonespresspasado, R16
                                  	
-000230 e608                      	LDI R16, 104     // 10ms 
+000232 e608                      	LDI R16, 104     // 10ms 
                                  DELAY_10MS_LOOP1:
-000231 ef1f                          LDI R17, 255     // Loop interno
+000233 ef1f                          LDI R17, 255     // Loop interno
                                  DELAY_10MS_LOOP2:
-000232 951a                          DEC R17
-000233 f7f1                          BRNE DELAY_10MS_LOOP2
-000234 950a                          DEC R16
-000235 f7d9                          BRNE DELAY_10MS_LOOP1
+000234 951a                          DEC R17
+000235 f7f1                          BRNE DELAY_10MS_LOOP2
+000236 950a                          DEC R16
+000237 f7d9                          BRNE DELAY_10MS_LOOP1
                                  	
-000236 b113                      	IN	R17, PINB			 // Leer estado de los botones
-000237 9310 0108                 	STS	Botonespressint, R17 // Guardar en variable de interrupción
-000239 9100 0108                 	LDS R16, Botonespressint
-00023b 9300 010a                     STS Botonespresspasado2, R16
+000238 b113                      	IN	R17, PINB			 // Leer estado de los botones
+000239 9310 0108                 	STS	Botonespressint, R17 // Guardar en variable de interrupción
+00023b 9100 0108                 	LDS R16, Botonespressint
+00023d 9300 010a                     STS Botonespresspasado2, R16
                                  
                                  	// Comparar con el valor pasado	
-00023d 9100 0109                 	LDS R16, Botonespresspasado
-00023f 9110 010a                 	LDS R17, Botonespresspasado2
+00023f 9100 0109                 	LDS R16, Botonespresspasado
+000241 9110 010a                 	LDS R17, Botonespresspasado2
                                  
-000241 1701                          CP R16, R17            // Comparara el estado pasado con el presente
-000242 f469                          BRNE FINBOTONES            // Si son diferentes, salir
+000243 1701                          CP R16, R17            // Comparara el estado pasado con el presente
+000244 f469                          BRNE FINBOTONES            // Si son diferentes, salir
                                  	
-000243 2f30                      	MOV R19, R16   // se guardan los verdaderos valores del boton
+000245 2f30                      	MOV R19, R16   // se guardan los verdaderos valores del boton
                                  	
-000244 ff30                      	SBRS R19, PB0
-000245 940e 0255                 	CALL boton_PB0
-000247 ff31                      	SBRS R19, PB1
-000248 940e 0257                 	CALL boton_PB1
-00024a ff32                      	SBRS R19, PB2
-00024b 940e 0260                 	CALL boton_PB2
-00024d ff33                      	SBRS R19, PB3
-00024e 940e 026b                 	CALL boton_PB3
+000246 ff30                      	SBRS R19, PB0
+000247 940e 0257                 	CALL boton_PB0
+000249 ff31                      	SBRS R19, PB1
+00024a 940e 0259                 	CALL boton_PB1
+00024c ff32                      	SBRS R19, PB2
+00024d 940e 0262                 	CALL boton_PB2
+00024f ff33                      	SBRS R19, PB3
+000250 940e 026d                 	CALL boton_PB3
                                  
                                  	FINBOTONES:
                                  
-000250 911f                      	POP R17
-000251 910f                      	POP R16
-000252 bf0f                      	OUT SREG, R16
+000252 911f                      	POP R17
 000253 910f                      	POP R16
-000254 9518                      	RETI
+000254 bf0f                      	OUT SREG, R16
+000255 910f                      	POP R16
+000256 9518                      	RETI
                                  
                                  boton_PB0://----------------------------
                                  	
-000255 9543                      	INC R20       //Cambia de modo
+000257 9543                      	INC R20       //Cambia de modo
                                      
-000256 9508                      	RET
+000258 9508                      	RET
                                  
                                  boton_PB1: //----------------------------
                                  	// selecciona el display
-000257 9100 010b                 	LDS R16, Selectordisp
-000259 9503                      	INC R16
-00025a 3004                      	CPI R16, 4
-00025b f008                      	BRLO SDOVER
-00025c 2700                      	CLR R16
+000259 9100 010b                 	LDS R16, Selectordisp
+00025b 9503                      	INC R16
+00025c 3004                      	CPI R16, 4
+00025d f008                      	BRLO SDOVER
+00025e 2700                      	CLR R16
                                  SDOVER:
-00025d 9300 010b                 	STS Selectordisp, R16
-00025f 9508                      	RET
+00025f 9300 010b                 	STS Selectordisp, R16
+000261 9508                      	RET
                                  
                                  boton_PB2: //----------------------------
                                  	
-000260 3042                      	CPI R20, 2
-000261 f019                          BREQ ACTIVOPB2
+000262 3042                      	CPI R20, 2
+000263 f019                          BREQ ACTIVOPB2
                                      
-000262 3043                          CPI R20, 3
-000263 f009                          BREQ ACTIVOPB2
+000264 3043                          CPI R20, 3
+000265 f009                          BREQ ACTIVOPB2
                                  
-000264 c005                      	RJMP boton_PB2fin
+000266 c005                      	RJMP boton_PB2fin
                                  ACTIVOPB2:
-000265 934f                      	PUSH R20
-000266 e041                      	LDI R20, 1
-000267 9340 010c                 	STS Configmas, R20
-000269 914f                      	POP R20
+000267 934f                      	PUSH R20
+000268 e041                      	LDI R20, 1
+000269 9340 010c                 	STS Configmas, R20
+00026b 914f                      	POP R20
                                  boton_PB2fin:
                                  
-00026a 9508                      	RET
+00026c 9508                      	RET
                                  
                                  boton_PB3: //----------------------------
-00026b 3042                      	CPI R20, 2
-00026c f019                          BREQ ACTIVOPB3
+00026d 3042                      	CPI R20, 2
+00026e f019                          BREQ ACTIVOPB3
                                      
-00026d 3043                          CPI R20, 3
-00026e f009                          BREQ ACTIVOPB3
+00026f 3043                          CPI R20, 3
+000270 f009                          BREQ ACTIVOPB3
                                  
-00026f c005                      	RJMP boton_PB3fin
+000271 c005                      	RJMP boton_PB3fin
                                  
                                  ACTIVOPB3:
-000270 935f                      	PUSH R21
-000271 e051                      	LDI R21, 1
-000272 9350 010d                 	STS Configmen, R21
-000274 915f                      	POP R21
+000272 935f                      	PUSH R21
+000273 e051                      	LDI R21, 1
+000274 9350 010d                 	STS Configmen, R21
+000276 915f                      	POP R21
                                  
                                  boton_PB3fin:
-000275 9508                      	RET
+000277 9508                      	RET
                                  
                                  // Tabla para display de 7 segmentos (referencia)
                                  disp7seg:
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(840): warning: .cseg .db misalignment - padding zero byte
-000276 003f                          .db 0b00111111 // 0
-C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(841): warning: .cseg .db misalignment - padding zero byte
-000277 0006                          .db 0b00000110 // 1
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(842): warning: .cseg .db misalignment - padding zero byte
-000278 005b                          .db 0b01011011 // 2
+000278 003f                          .db 0b00111111 // 0
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(843): warning: .cseg .db misalignment - padding zero byte
-000279 0057                          .db 0b01010111 // 3
+000279 0006                          .db 0b00000110 // 1
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(844): warning: .cseg .db misalignment - padding zero byte
-00027a 0066                          .db 0b01100110 // 4
+00027a 005b                          .db 0b01011011 // 2
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(845): warning: .cseg .db misalignment - padding zero byte
-00027b 0075                          .db 0b01110101 // 5
+00027b 0057                          .db 0b01010111 // 3
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(846): warning: .cseg .db misalignment - padding zero byte
-00027c 007d                          .db 0b01111101 // 6
+00027c 0066                          .db 0b01100110 // 4
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(847): warning: .cseg .db misalignment - padding zero byte
-00027d 0007                          .db 0b00000111 // 7
+00027d 0075                          .db 0b01110101 // 5
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(848): warning: .cseg .db misalignment - padding zero byte
-00027e 007f                          .db 0b01111111 // 8
+00027e 007d                          .db 0b01111101 // 6
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(849): warning: .cseg .db misalignment - padding zero byte
-00027f 0067                          .db 0b01100111 // 9
+00027f 0007                          .db 0b00000111 // 7
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(850): warning: .cseg .db misalignment - padding zero byte
-000280 0077                          .db 0b01110111 // A
+000280 007f                          .db 0b01111111 // 8
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(851): warning: .cseg .db misalignment - padding zero byte
-000281 007c                          .db 0b01111100 // b
+000281 0067                          .db 0b01100111 // 9
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(852): warning: .cseg .db misalignment - padding zero byte
-000282 0039                          .db 0b00111001 // C
+000282 0077                          .db 0b01110111 // A
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(853): warning: .cseg .db misalignment - padding zero byte
-000283 005e                          .db 0b01011110 // d
+000283 007c                          .db 0b01111100 // b
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(854): warning: .cseg .db misalignment - padding zero byte
-000284 0079                          .db 0b01111001 // E
+000284 0039                          .db 0b00111001 // C
 C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(855): warning: .cseg .db misalignment - padding zero byte
+000285 005e                          .db 0b01011110 // d
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(856): warning: .cseg .db misalignment - padding zero byte
+000286 0079                          .db 0b01111001 // E
+C:\Users\Dasil\OneDrive\Documentos\GitHub\PROJECT-reloj\PROJECT-reloj\main.asm(857): warning: .cseg .db misalignment - padding zero byte
 
 
 RESOURCE USE INFORMATION
@@ -1919,20 +1921,20 @@ counted separately from r26..r31 here.
 x  :   0 y  :   0 z  :   1 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
 r13:   0 r14:   0 r15:   0 r16:  69 r17:  15 r18:  25 r19:   6 r20:  22 
-r21:  12 r22:  27 r23:   9 r24:  27 r25:   9 r26:  15 r27:   4 r28:  39 
+r21:  12 r22:  27 r23:   9 r24:  28 r25:   9 r26:  15 r27:   4 r28:  39 
 r29:   1 r30:   5 r31:   5 
 Registers used: 17 out of 35 (48.6%)
 
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   1 add   :   1 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :  51 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  52 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :  20 brlt  :   0 brmi  :   0 
 brne  :   5 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :  22 cbi   :  33 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  49 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   1 cpc   :   0 
-cpi   :  73 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0 
+cpi   :  74 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :  20 jmp   :   0 
 ld    :   0 ldd   :   0 ldi   :  26 lds   :  26 lpm   :   2 lsl   :   1 
 lsr   :   0 mov   :   6 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
@@ -1948,7 +1950,7 @@ Instructions used: 29 out of 113 (25.7%)
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00050c   1162     32   1194   32768   3.6%
+[.cseg] 0x000000 0x000510   1166     32   1198   32768   3.7%
 [.dseg] 0x000100 0x000111      0     17     17    2048   0.8%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
