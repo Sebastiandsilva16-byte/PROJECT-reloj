@@ -89,6 +89,9 @@ SETUP:
 	//LEDS ":"
 	SBI DDRB, DDB5    // PB5 salida
     CBI PORTB, PORTB5
+	//LED ALARMA
+	SBI DDRB, DDB4    // PB4 salida
+    CBI PORTB, PORTB4
 	// LED MODO
 	SBI DDRD, DDD7    // PD7 salida
     CBI PORTD, PORTD7
@@ -235,11 +238,14 @@ MODO3: // CONGIG MD
 MODO4: // CONFIG ALARMA
 //	asigna r16 para que se muestre HH : MM
 	CLR R16
+	SBI PORTB, PORTB4	//(modo alarma)
+	CALL ALARMACONFIG
     RJMP FIN_COMPARAR
 
 MODO5: // APAGAR ALARMA
  //	asigna r16 para que se muestre HH : MM
 	CLR R16
+	CALL ALARMACONFIGON
     RJMP FIN_COMPARAR
 
 FIN_COMPARAR:
@@ -1625,6 +1631,13 @@ CEROCERO:
 	LDI R18, 1          // Cargar 1 en R18
 	no_cero:
 	RET
+
+//--------------------------------------------------------------------------------------------------------ALARMA
+ALARMACONFIG:
+	RET
+ALARMACONFIGON:
+	RET
+
 
 //--------------------------------------------------------------------------------------------------------INTERRUPCIONES
 
