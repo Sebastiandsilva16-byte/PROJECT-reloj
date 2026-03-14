@@ -392,8 +392,9 @@ SuniDdia:
 		RJMP MESLOG7
 		TREINTAFIN7:              // Incrementar decenas de día en 1
 		CPI R22, 5          // Comparar R18 (decenas de día) con 4
-		BRLO TIMER_RET27      
-		CLR R22              
+		BRLO TIMER_RET27  
+		CLR R22  
+		LDI R18, 1                 
 		INC R24              // Incrementar unidades de mes
 		 //ahora va a ver la logica de los meses
 	TEMPORAL7:
@@ -413,7 +414,8 @@ SuniDdia:
 		INC R22              // Incrementar decenas de día en 1
 	VEINTEFIN7:
 		CPI R22, 3          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET27      
+		BRLO TIMER_RET27 
+		LDI R18, 1      
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		RJMP MESLOG7 //ahora va a ver la logica de los meses
@@ -435,7 +437,8 @@ SuniDdia:
 	TREINTAUNOFIN7:
 		CPI R22, 4          // Comparar R18 (decenas de día) con 3
 		BRLO TIMER_RET27     
-		CLR R22              
+		CLR R22    
+		LDI R18, 1           
 		INC R24              // Incrementar unidades de mes 
 	MESLOG7: //ahora va a ver la logica de los meses
 		CALL MESLOG
@@ -464,11 +467,103 @@ SuniDdia:
 		CLR R22
 		LDI R18, 1    	 
 	TIMER_RET27:
+		CALL cerocero      // arreglotemp
 		CALL SAVEDM
 		RET
 
 SdecDdia:
-	RET
+		CALL LOGDIAS			//para ver como se debe efectuar la suma de dias
+
+		LDS R28, Mes
+		CPI R28, 0  
+		BREQ TREINTA_Y_UN_DIAS8
+    
+		CPI R28, 1
+		BREQ TREINTA_DIAS8
+    
+		CPI R28, 2  
+		BREQ VEINTIOCHO_DIAS8
+
+
+	TREINTA_DIAS8: // Aquí va la lógica para meses de 30 días ----------------------------------------------
+		INC R22
+		CPI R22, 4
+		BREQ TREINTA8
+		RJMP MESLOG8
+		TREINTA8: 
+		INC R24  
+		LDI R18, 1              
+		CLR R22          
+		RJMP MESLOG8
+
+	VEINTIOCHO_DIAS8:	// Aquí va la lógica para febrero (28 días)----------------------------------------------------}
+		INC R22
+		CPI R22, 3
+		BREQ VEINTE8
+		RJMP VEINTEFIN8
+	VEINTE8:
+		LDI R18, 1    
+		CLR R22           
+		INC R24           
+		RJMP MESLOG8   
+	VEINTEFIN8:
+		CPI R22, 3          // Comparar R18 (decenas de día) con 3
+		BRLO TIMER_RET28      
+		LDI R18, 1 
+		CLR R22              
+		INC R24              // Incrementar unidades de mes
+		RJMP MESLOG8 //ahora va a ver la logica de los meses
+	TREINTA_Y_UN_DIAS8: // Aquí va la lógica para meses de 31 días -----------------------------------------------------
+		CPI R22, 3
+		BREQ TREINTAUNO8
+		CPI R18, 10          // Comparar R18 (unidades de día) con 10
+		BRLO TIMER_RET28      
+		CLR R18              
+		INC R22              // Incrementar decenas de día en 1
+		RJMP TREINTAUNOFIN8
+	TREINTAUNO8:
+		CPI R18, 2          // Comparar R18 (unidades de día) con 9
+		BRLO TIMER_RET28    
+		CLR R18              
+		CLR R22              
+		INC R24 
+		RJMP MESLOG8
+	TREINTAUNOFIN8:
+		CPI R22, 4          // Comparar R18 (decenas de día) con 3
+		BRLO TIMER_RET28     
+		LDI R18, 1 
+		CLR R22              
+		INC R24              // Incrementar unidades de mes 
+	MESLOG8: //ahora va a ver la logica de los meses
+		CALL MESLOG
+	   
+		LDS R28, Mess
+		CPI R28, 0  
+		BREQ MESNORMAL8
+    
+		CPI R28, 1
+		BREQ MES108
+		
+		MESNORMAL8:
+		CPI R24, 10          // si alcanzan las decenas suma 1
+		BRLO TIMER_RET28      
+		CLR R24            
+		INC R26              // Incrementar decenas de mes      
+		CLR R22
+		LDI R18, 1 
+		RJMP TIMER_RET28
+
+		MES108:
+		CPI R24, 3          // si alcanza 3 reinicia
+		BRLO TIMER_RET28      
+		LDI R24, 1            
+		CLR R26   
+		CLR R22
+		LDI R18, 1    	 
+	TIMER_RET28:
+		CALL cerocero      // arreglotemp
+		CALL SAVEDM
+		RET	
 //---------------------------------RESTA DIAMES
 RESTADM:
 	LDS R28, Selectordisp
@@ -622,7 +717,8 @@ SuniDmin:
 		RJMP MESLOG3
 		TREINTAFIN3:              // Incrementar decenas de día en 1
 		CPI R22, 4          // Comparar R18 (decenas de día) con 4
-		BRLO TIMER_RET23      
+		BRLO TIMER_RET23   
+		LDI R18, 1    
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		 //ahora va a ver la logica de los meses
@@ -644,6 +740,7 @@ SuniDmin:
 	VEINTEFIN3:
 		CPI R22, 3          // Comparar R18 (decenas de día) con 3
 		BRLO TIMER_RET23      
+		LDI R18, 1 
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		RJMP MESLOG3 //ahora va a ver la logica de los meses
@@ -664,7 +761,8 @@ SuniDmin:
 		RJMP MESLOG3
 	TREINTAUNOFIN3:
 		CPI R22, 4          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET23      
+		BRLO TIMER_RET23  
+		LDI R18, 1     
 		CLR R22              
 		INC R24              // Incrementar unidades de mes 
 	MESLOG3: //ahora va a ver la logica de los meses
@@ -694,6 +792,7 @@ SuniDmin:
 		CLR R22
 		LDI R18, 1    	 
 	TIMER_RET23:
+		CALL cerocero      // arreglotemp
 		CALL SAVEDM
 		RET
 
@@ -763,7 +862,8 @@ SdecDmin:
 		RJMP MESLOG4
 		TREINTAFIN4:              // Incrementar decenas de día en 1
 		CPI R22, 4          // Comparar R18 (decenas de día) con 4
-		BRLO TIMER_RET24      
+		BRLO TIMER_RET24   
+		LDI R18, 1    
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		 //ahora va a ver la logica de los meses
@@ -784,7 +884,8 @@ SdecDmin:
 		INC R22              // Incrementar decenas de día en 1
 	VEINTEFIN4:
 		CPI R22, 3          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET24      
+		BRLO TIMER_RET24 
+		LDI R18, 1      
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		RJMP MESLOG4 //ahora va a ver la logica de los meses
@@ -805,7 +906,8 @@ SdecDmin:
 		RJMP MESLOG4
 	TREINTAUNOFIN4:
 		CPI R22, 4          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET24      
+		BRLO TIMER_RET24     
+		LDI R18, 1  
 		CLR R22              
 		INC R24              // Incrementar unidades de mes 
 	MESLOG4: //ahora va a ver la logica de los meses
@@ -835,6 +937,7 @@ SdecDmin:
 		CLR R22
 		LDI R18, 1    	 
 	TIMER_RET24:
+		CALL cerocero
 		CALL SAVEDM
 		RET	
 SuniDhora:
@@ -898,7 +1001,8 @@ SuniDhora:
 		RJMP MESLOG5
 		TREINTAFIN5:              // Incrementar decenas de día en 1
 		CPI R22, 5          // Comparar R18 (decenas de día) con 4
-		BRLO TIMER_RET25      
+		BRLO TIMER_RET25
+		LDI R18, 1       
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		 //ahora va a ver la logica de los meses
@@ -919,7 +1023,8 @@ SuniDhora:
 		INC R22              // Incrementar decenas de día en 1
 	VEINTEFIN5:
 		CPI R22, 3          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET25      
+		BRLO TIMER_RET25     
+		LDI R18, 1  
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		RJMP MESLOG5 //ahora va a ver la logica de los meses
@@ -940,7 +1045,8 @@ SuniDhora:
 		RJMP MESLOG5
 	TREINTAUNOFIN5:
 		CPI R22, 4          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET25      
+		BRLO TIMER_RET25 
+		LDI R18, 1      
 		CLR R22              
 		INC R24              // Incrementar unidades de mes 
 	MESLOG5: //ahora va a ver la logica de los meses
@@ -970,6 +1076,7 @@ SuniDhora:
 		CLR R22
 		LDI R18, 1    	 
 	TIMER_RET25:
+		CALL cerocero
 		CALL SAVEDM
 		RET
 SdecDhora:
@@ -1026,7 +1133,8 @@ SdecDhora:
 		RJMP MESLOG6
 		TREINTAFIN6:              // Incrementar decenas de día en 1
 		CPI R22, 5          // Comparar R18 (decenas de día) con 4
-		BRLO TIMER_RET26      
+		BRLO TIMER_RET26   
+		LDI R18, 1    
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		 //ahora va a ver la logica de los meses
@@ -1047,7 +1155,8 @@ SdecDhora:
 		INC R22              // Incrementar decenas de día en 1
 	VEINTEFIN6:
 		CPI R22, 3          // Comparar R18 (decenas de día) con 3
-		BRLO TIMER_RET26      
+		BRLO TIMER_RET26  
+		LDI R18, 1     
 		CLR R22              
 		INC R24              // Incrementar unidades de mes
 		RJMP MESLOG6 //ahora va a ver la logica de los meses
@@ -1067,7 +1176,8 @@ SdecDhora:
 		INC R24 
 		RJMP MESLOG6
 	TREINTAUNOFIN6:
-		CPI R22, 4          // Comparar R18 (decenas de día) con 3
+		CPI R22, 4    
+		LDI R18, 1       // Comparar R18 (decenas de día) con 3
 		BRLO TIMER_RET26      
 		CLR R22              
 		INC R24              // Incrementar unidades de mes 
@@ -1098,6 +1208,7 @@ SdecDhora:
 		CLR R22
 		LDI R18, 1    	 
 	TIMER_RET26:
+		CALL cerocero
 		CALL SAVEDM
 		RET
 //-----------------RESTA HORAMIN
@@ -1323,7 +1434,8 @@ TREINTA_DIAS: // Aquí va la lógica para meses de 30 días -----------------------
 	RJMP MESLOG
 	TREINTAFIN:              // Incrementar decenas de día en 1
 	CPI R22, 4          // Comparar R18 (decenas de día) con 4
-	BRLO TIMER_RET2      
+	BRLO TIMER_RET2     
+	LDI R18, 1  
 	CLR R22              
 	INC R24              // Incrementar unidades de mes
 	RJMP MESLOG //ahora va a ver la logica de los meses
@@ -1344,7 +1456,8 @@ VEINTE:
 	INC R22              // Incrementar decenas de día en 1
 VEINTEFIN:
 	CPI R22, 3          // Comparar R18 (decenas de día) con 3
-	BRLO TIMER_RET2      
+	BRLO TIMER_RET2  
+	LDI R18, 1     
 	CLR R22              
 	INC R24              // Incrementar unidades de mes
 	RJMP MESLOG //ahora va a ver la logica de los meses
@@ -1365,7 +1478,8 @@ TREINTAUNO:
 	RJMP MESLOG
 TREINTAUNOFIN:
 	CPI R22, 4          // Comparar R18 (decenas de día) con 3
-	BRLO TIMER_RET2      
+	BRLO TIMER_RET2   
+	LDI R18, 1    
 	CLR R22              
 	INC R24              // Incrementar unidades de mes 
 MESLOG: //ahora va a ver la logica de los meses
@@ -1395,6 +1509,7 @@ MESLOG: //ahora va a ver la logica de los meses
 	CLR R22
 	LDI R18, 1    	 
 TIMER_RET2:
+	CALL cerocero
 	CALL SAVEDM
     RET
 
@@ -1452,6 +1567,18 @@ MESS0:
 
 MESSLOG2FIN: 
 	RET
+
+//------correcion en la cuenta de dias
+CEROCERO:
+	CPI R22, 0          // Compara R22 con 0
+	BRNE no_cero        
+	CPI R18, 0       //  R18 con 0   
+	BRNE no_cero        
+	// Si llegamos aquí, AMBOS son 0
+	LDI R18, 1          // Cargar 1 en R18
+	no_cero:
+	RET
+
 //--------------------------------------------------------------------------------------------------------INTERRUPCIONES
 
 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
