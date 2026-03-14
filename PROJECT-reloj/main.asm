@@ -315,10 +315,18 @@ CONFIGMESDIA:
 SUMARDM1:
 	CALL LOADDM
 	CALL SUMARDM
+		PUSH R28
+		CLR R28
+		STS Configmas, R28
+		POP R28
 	RET
 RESTADM1:
 	CALL LOADDM
 	CALL RESTADM
+		PUSH R28
+		CLR R28
+		STS Configmas, R28
+		POP R28
 	RET
 //--------------------------------SUMA DIAMES
 SUMARDM:
@@ -458,7 +466,7 @@ SuniDdia:
 	TIMER_RET27:
 		CALL SAVEDM
 		RET
-	RET
+
 SdecDdia:
 	RET
 //---------------------------------RESTA DIAMES
