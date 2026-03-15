@@ -29,8 +29,12 @@
 	Mess:					.byte 1
 	PBceroB:				.byte 1
 	PBunoB:					.byte 1
-	PBdosB:				.byte 1
+	PBdosB:					.byte 1
 	PBtresB:				.byte 1
+	alarmaUM:				.byte 1
+	alarmaDM:				.byte 1
+	alarmaUH:				.byte 1
+	alarmaDH:				.byte 1
 	
 .cseg
 .org 0x0000
@@ -142,6 +146,10 @@ SETUP:
     STS decenasHOR, R16
 	STS decenasMES, R16
 	STS decenasDIA, R16
+	STS alarmaUM, R16			
+	STS alarmaDM, R16		
+	STS alarmaUH, R16			
+	STS alarmaDH, R16				
 
 
     // Inicializar registros
@@ -203,6 +211,7 @@ MODO0: //HORAS / MINUTOS
 // des activa el led naranja para indicar HH:MM
 	CLR R16
 	CBI PORTD, PORTD7
+	CBI PORTB, PORTB4 //TEMPORAL................................
     CALL TIEMPO
     RJMP FIN_COMPARAR
 
@@ -236,15 +245,18 @@ MODO3: // CONGIG MD
     RJMP FIN_COMPARAR
 
 MODO4: // CONFIG ALARMA
-//	asigna r16 para que se muestre HH : MM
-	CLR R16
-	SBI PORTB, PORTB4	//(modo alarma)
+//	asigna r16 para que se muestre Alarma
+	LDI R16, 2
+	CBI PORTB, PORTB5	// los : no se encienden (modo alarma)
+	SBI PORTD, PORTD7	// no se puede activar alarma
 	CALL ALARMACONFIG
     RJMP FIN_COMPARAR
 
 MODO5: // APAGAR ALARMA
- //	asigna r16 para que se muestre HH : MM
-	CLR R16
+ //	asigna r16 para que se muestre Alarma
+	LDI R16, 2
+	CBI PORTB, PORTB5	// los : no se encienden (modo alarma)
+	SBI PORTD, PORTD7	//	indica que se puede activar alarma
 	CALL ALARMACONFIGON
     RJMP FIN_COMPARAR
 
@@ -284,6 +296,19 @@ SAVEDM:
     STS unidadesMES, R24    // Guardar Unidades de MES
     STS decenasMES, R26     // Guardar Decenas de MES
 	RET
+LOADAL:
+	LDS R18, alarmaUM	
+	LDS R22, alarmaDM
+	LDS R24, alarmaUH	
+	LDS R26, alarmaDH
+	RET
+SAVEAL:
+	STS alarmaUM, R18	
+	STS alarmaDM, R22	
+	STS alarmaUH, R24		
+	STS alarmaDH, R26
+	RET
+
 
 //--------------------------------------------------------------------------------------CONFIGRELOJ
 //Toda la logia para la suma y resta manual del reloj
@@ -1290,12 +1315,20 @@ RdecDhora:
 // toda la logica para el funcionamiento de los displays
 DISPF:
 
+	CPI R16, 2
+    BREQ ALARMA
+
 	CPI R16, 1
     BREQ MESDIA
     
     CPI R16, 0
     BREQ HORAMIN
 
+
+
+ALARMA:
+	CALL LOADAL
+	RJMP DISPSELCALC
 MESDIA:
 	CALL LOADDMINV
 	RJMP DISPSELCALC
@@ -1634,7 +1667,64 @@ CEROCERO:
 
 //--------------------------------------------------------------------------------------------------------ALARMA
 ALARMACONFIG:
+	LDS R28, Configmas  
+	CPI R28, 0
+	BREQ ALARMACONFIGFIN
+	CALL LOADAL
+
+	LDS R28, Selectordisp
+	
+	CPI R28, 0 // Compara con 0
+    BREQ SuniDmin1
+    CPI R28, 1 // Compara con 1
+    BREQ SdecDmin1
+    CPI R28, 2 // Compara con 2
+    BREQ SuniDhora1
+    CPI R28, 3 // Compara con 3
+    BREQ SdecDhora1
+
+		PUSH R28
+		CLR R28
+		STS Configmas, R28
+		POP R28
 	RET
+ALARMACONFIGFIN:
+	RET
+
+SuniDmin1:
+	CALL AlarmUM
+	RET
+SdecDmin1:
+	CALL AlarmDM
+	RET
+SuniDhora1:
+	CALL AlarmUH
+	RET
+SdecDhora1:
+	CALL AlarmDH
+	RET
+
+AlarmUM:
+		INC R18
+		CPI R18, 10
+		BRLO AlarmUMFIN
+		CLR R18
+	AlarmUMFIN:
+		CALL SAVEAL
+		RET
+AlarmDM:
+		LDI R22, 1
+		CALL SAVEAL
+		RET
+AlarmUH:
+		LDI R24, 1
+		CALL SAVEAL
+		RET
+AlarmDH:
+		LDI R26, 1
+		CALL SAVEAL
+		RET	
+
 ALARMACONFIGON:
 	RET
 
@@ -1644,17 +1734,16 @@ ALARMACONFIGON:
 // Rutina de interrupci?n del Timer1 - Modo COMPARE MATCH
 // Se encarga de contar los segundos
 TIMER1_COMPA:      
-    PUSH R16
-    IN R16, SREG
-    PUSH R16
-
+    PUSH R18
+    IN R18, SREG
+    PUSH R18
 
     INC R17                 // Incrementar contador de ciclos
 	SBI PINB, PINB5			// titila cada que pasa un seg
 
-	POP R16      
-	OUT SREG, R16 
-	POP R16     
+	POP R18      
+	OUT SREG, R18 
+	POP R18     
 	RETI
 
 // Rutina de interrupcion del PORTB
@@ -1764,6 +1853,9 @@ boton_PB2: //----------------------------
     CPI R20, 3
     BREQ ACTIVOPB2
 
+	CPI R20, 4
+    BREQ ACTIVOPB2
+
 	RJMP boton_PB2fin
 ACTIVOPB2:
 	PUSH R28
@@ -1779,6 +1871,9 @@ boton_PB3: //----------------------------
     BREQ ACTIVOPB3
     
     CPI R20, 3
+    BREQ ACTIVOPB3
+
+	CPI R20, 4
     BREQ ACTIVOPB3
 
 	RJMP boton_PB3fin
